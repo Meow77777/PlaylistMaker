@@ -11,78 +11,78 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/app_name"
+        android:layout_marginStart="@dimen/padding4"
+        android:layout_marginTop="@dimen/padding4"
         android:layout_marginEnd="52dp"
-        android:textSize="@dimen/main_view_size"
-        android:textColor="@color/white"
+        android:layout_marginBottom="@dimen/padding4"
         android:paddingStart="@dimen/padding12"
         android:paddingTop="10dp"
         android:paddingBottom="@dimen/padding12"
-        android:layout_marginTop="@dimen/padding4"
-        android:layout_marginStart="@dimen/padding4"
-        android:layout_marginBottom="@dimen/padding4"
-        />
+        android:text="@string/app_name"
+        android:textColor="@color/white"
+        android:textSize="@dimen/main_view_size" />
 
-    <Button
-        android:id="@+id/poisk_button"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:layout_marginLeft="@dimen/padding16"
         android:layout_marginTop="24dp"
-        android:textAllCaps="false"
         android:layout_marginRight="@dimen/padding16"
-        android:layout_weight="1"
-        android:backgroundTint="@color/white"
-        android:text="@string/poisk"
-        android:textColor="@color/black"
-        android:textSize="@dimen/main_view_size"
+        android:orientation="vertical">
 
-        app:cornerRadius="@dimen/padding16"
-        app:icon="@drawable/light_mode"
-        app:iconGravity="textStart"
-        app:iconPadding="@dimen/icon_padding"
-        app:iconTint="@color/black" />
+        <Button
+            android:id="@+id/poisk_button"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/white"
+            android:text="@string/poisk"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:textSize="@dimen/main_view_size"
 
-    <Button
-        android:id="@+id/mediateka_button"
-        android:layout_height="0dp"
-        android:layout_width="match_parent"
-        android:layout_weight="1"
-        android:textAllCaps="false"
-        android:layout_marginRight="@dimen/padding16"
-        android:layout_marginLeft="@dimen/padding16"
-        android:layout_marginTop="@dimen/padding16"
-        android:text="@string/mediateka"
-        android:textSize="@dimen/main_view_size"
-        android:textColor="@color/black"
-        android:backgroundTint="@color/white"
+            app:cornerRadius="@dimen/padding16"
+            app:icon="@drawable/search"
+            app:iconGravity="textStart"
+            app:iconPadding="@dimen/icon_padding"
+            app:iconTint="@color/black" />
 
-        app:icon="@drawable/light_mode2"
-        app:iconGravity="textStart"
-        app:iconPadding="@dimen/icon_padding"
-        app:iconTint="@color/black"
-        app:cornerRadius="@dimen/padding16"
-        />
-    <Button
-        android:id="@+id/settings_button"
-        android:layout_height="0dp"
-        android:layout_width="match_parent"
-        android:layout_weight="1"
-        android:textAllCaps="false"
-        android:layout_marginRight="@dimen/padding16"
-        android:layout_marginLeft="@dimen/padding16"
-        android:layout_marginTop="@dimen/padding16"
-        android:layout_marginBottom="28dp"
-        android:text="@string/settings"
-        android:textSize="@dimen/main_view_size"
-        android:textColor="@color/black"
-        android:backgroundTint="@color/white"
+        <Button
+            android:id="@+id/mediateka_button"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/padding16"
+            android:layout_weight="1"
+            android:backgroundTint="@color/white"
+            android:text="@string/mediateka"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:textSize="@dimen/main_view_size"
 
-        app:icon="@drawable/group"
-        app:iconGravity="textStart"
-        app:iconPadding="@dimen/icon_padding"
-        app:iconTint="@color/black"
-        app:cornerRadius="@dimen/padding16"
-        />
+            app:cornerRadius="@dimen/padding16"
+            app:icon="@drawable/mediateka"
+            app:iconGravity="textStart"
+            app:iconPadding="@dimen/icon_padding"
+            app:iconTint="@color/black" />
 
+        <Button
+            android:id="@+id/settings_button"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/padding16"
+            android:layout_marginBottom="28dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/white"
+            android:text="@string/settings"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:textSize="@dimen/main_view_size"
+
+            app:cornerRadius="@dimen/padding16"
+            app:icon="@drawable/settings"
+            app:iconGravity="textStart"
+            app:iconPadding="@dimen/icon_padding"
+            app:iconTint="@color/black" />
     </LinearLayout>
+
+</LinearLayout>

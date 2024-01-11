@@ -12,9 +12,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val poisk = findViewById<Button>(R.id.poisk_button)
-        val mediateka = findViewById<Button>(R.id.mediateka_button)
-        val settings = findViewById<Button>(R.id.settings_button)
+        val buttonSearch = findViewById<Button>(R.id.poisk_button)
+        val buttonMediateka = findViewById<Button>(R.id.mediateka_button)
+        val buttonSettings = findViewById<Button>(R.id.settings_button)
 
         val poiskIntent = Intent(this, PoiskActivity::class.java)
         val imageClickListener: View.OnClickListener = object : View.OnClickListener {
@@ -22,14 +22,14 @@ class MainActivity : AppCompatActivity() {
                 startActivity(poiskIntent)
             }
         }
-        poisk.setOnClickListener(imageClickListener)
+        buttonSearch.setOnClickListener(imageClickListener)
 
-        mediateka.setOnClickListener {
+        buttonMediateka.setOnClickListener {
             val mediatekaIntent = Intent(this, MediatekaActivity::class.java)
             startActivity(mediatekaIntent)
         }
 
-        settings.setOnClickListener {
+        buttonSettings.setOnClickListener {
             val settingsIntent = Intent(this, SettingsActivity::class.java)
             startActivity(settingsIntent)
         }
