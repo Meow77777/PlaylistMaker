@@ -40,7 +40,6 @@
             android:textAllCaps="false"
             android:textColor="@color/black"
             android:textSize="@dimen/main_view_size"
-
             app:cornerRadius="@dimen/padding16"
             app:icon="@drawable/search"
             app:iconGravity="textStart"
@@ -58,7 +57,6 @@
             android:textAllCaps="false"
             android:textColor="@color/black"
             android:textSize="@dimen/main_view_size"
-
             app:cornerRadius="@dimen/padding16"
             app:icon="@drawable/mediateka"
             app:iconGravity="textStart"
@@ -77,7 +75,6 @@
             android:textAllCaps="false"
             android:textColor="@color/black"
             android:textSize="@dimen/main_view_size"
-
             app:cornerRadius="@dimen/padding16"
             app:icon="@drawable/settings"
             app:iconGravity="textStart"
