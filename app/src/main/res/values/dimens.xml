@@ -6,6 +6,8 @@
     <dimen name="padding44">44dp</dimen>
     <dimen name="padding12">12dp</dimen>
     <dimen name="padding4">4dp</dimen>
-    <dimen name="icon_padding">8dp</dimen>
+    <dimen name="padding8">8dp</dimen>
     <dimen name="margin_vertical_settings">21dp</dimen>
+    <dimen name="padding10">10dp</dimen>
+    <dimen name="padding40">40dp</dimen>
 </resources>
