@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
@@ -14,6 +15,7 @@ import androidx.core.view.isVisible
 import com.google.android.material.textfield.TextInputLayout
 
 class PoiskActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_poisk)
@@ -47,7 +49,7 @@ class PoiskActivity : AppCompatActivity() {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 if (p0.isNullOrEmpty()) {
                     buttonSearchDelete.isVisible = false
-                    closekeyboard(editText)
+                    closeKeyboard(editText)
                 } else {
                     buttonSearchDelete.isVisible = true
                     enterEditText = editText.text.toString()
@@ -63,7 +65,7 @@ class PoiskActivity : AppCompatActivity() {
 
     }
 
-    fun closekeyboard(view: View) {
+    private fun closeKeyboard(view: View) {
         val inputMethodManager =
             getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
         inputMethodManager?.hideSoftInputFromWindow(view.windowToken, 0)
@@ -82,7 +84,7 @@ class PoiskActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val EDIT_TEXT = "TEXT"
-        const val EDIT_TEXT_ENTER = ""
+        private const val EDIT_TEXT = "TEXT"
+        private const val EDIT_TEXT_ENTER = ""
     }
 }

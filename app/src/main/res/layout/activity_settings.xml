@@ -31,7 +31,6 @@
             android:layout_height="match_parent"
             android:paddingStart="@dimen/padding12"
             android:paddingTop="10dp"
-            android:paddingEnd="86dp"
             android:paddingBottom="@dimen/padding12"
             android:text="@string/settings" />
     </LinearLayout>
