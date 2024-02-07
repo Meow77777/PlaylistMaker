@@ -58,6 +58,6 @@
         android:layout_marginVertical="@dimen/size18"
         android:layout_marginStart="@dimen/padding8"
         android:layout_marginEnd="@dimen/padding12"
-        android:src="@drawable/user_agreement" />
+        android:background="@drawable/user_agreement" />
 
 </FrameLayout>
