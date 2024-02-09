@@ -11,7 +11,8 @@
         android:id="@+id/SongImageList"
         style="@style/SongSearchListImage"
         android:layout_gravity="start"
-        tools:src="@drawable/support" />
+        tools:src="@drawable/support"
+        app:cornerRadius="29dp"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
