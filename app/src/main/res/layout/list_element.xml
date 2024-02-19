@@ -11,8 +11,8 @@
         android:id="@+id/SongImageList"
         style="@style/SongSearchListImage"
         android:layout_gravity="start"
-        tools:src="@drawable/support"
-        app:cornerRadius="29dp"/>
+        app:cornerRadius="29dp"
+        tools:src="@drawable/support" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -33,7 +33,7 @@
             android:layout_marginTop="@dimen/size1"
             android:orientation="horizontal">
 
-            <FrameLayout
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent">
 
@@ -41,15 +41,14 @@
                     android:id="@+id/SongAuthorList"
                     style="@style/SongSearchListAuthor"
                     android:layout_gravity="start"
-                    app:drawableEndCompat="@drawable/dot"
                     tools:text="The Beatles" />
 
                 <TextView
                     android:id="@+id/SongTimeList"
                     style="@style/SongSearchListTime"
                     android:layout_gravity="end"
-                    tools:text="2:55" />
-            </FrameLayout>
+                    tools:text="02:55" />
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>

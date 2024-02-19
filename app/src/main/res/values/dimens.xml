@@ -18,4 +18,9 @@
     <dimen name="size1">1dp</dimen>
     <dimen name="size18">18dp</dimen>
     <dimen name="size21">21dp</dimen>
+    <dimen name="size136">136dp</dimen>
+    <dimen name="size24">24dp</dimen>
+    <dimen name="size54">54dp</dimen>
+    <dimen name="size334">334dp</dimen>
+    <dimen name="text_size_14">14sp</dimen>
 </resources>
