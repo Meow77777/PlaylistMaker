@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+
+    <ImageView
+        android:id="@+id/SongImageList"
+        style="@style/SongSearchListImage"
+        android:layout_gravity="start"
+        tools:src="@drawable/support"
+        app:cornerRadius="29dp"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/size14"
+        android:layout_marginStart="@dimen/size66"
+        android:layout_marginEnd="@dimen/padding44"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/SongNameList"
+            style="@style/SongSearchListName"
+            tools:text="Yesterday (Remastered 2009)" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/size1"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/SongAuthorList"
+                    style="@style/SongSearchListAuthor"
+                    android:layout_gravity="start"
+                    app:drawableEndCompat="@drawable/dot"
+                    tools:text="The Beatles" />
+
+                <TextView
+                    android:id="@+id/SongTimeList"
+                    style="@style/SongSearchListTime"
+                    android:layout_gravity="end"
+                    tools:text="2:55" />
+            </FrameLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <ImageView
+        style="@style/IconSettingsStyle"
+        android:layout_marginVertical="@dimen/size18"
+        android:layout_marginStart="@dimen/padding8"
+        android:layout_marginEnd="@dimen/padding12"
+        android:background="@drawable/user_agreement" />
+
+</FrameLayout>

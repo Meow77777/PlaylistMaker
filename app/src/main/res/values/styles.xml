@@ -87,5 +87,45 @@
         <item name="android:tint">@color/gray</item>
     </style>
 
+    <style name="SongSearchListImage">
+        <item name="android:layout_width">@dimen/size45</item>
+        <item name="android:layout_height">@dimen/size45</item>
+        <item name="android:layout_marginVertical">@dimen/padding8</item>
+        <item name="android:layout_marginStart">@dimen/size13</item>
+    </style>
+
+    <style name="SongSearchListName">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:gravity">start|center_vertical</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textSize">@dimen/settings_size</item>
+    </style>
+
+    <style name="SongSearchListAuthor">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:gravity">start|center_vertical</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textSize">@dimen/text_size_11</item>
+        <item name="android:layout_marginEnd">@dimen/size21</item>
+        <item name="drawableTint">@color/gray</item>
+    </style>
+
+    <style name="SongSearchListTime">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:gravity">start|center_vertical</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:textSize">@dimen/text_size_11</item>
+    </style>
+
 </resources>
 
