@@ -114,8 +114,15 @@
     <style name="NoInternetImage">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:src">@drawable/no_internet_dark</item>
         <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:background">@drawable/no_internet_dark</item>
+    </style>
+
+    <style name="NothingFoundImage">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:background">@drawable/nothing_found_dark</item>
     </style>
 
     <style name="TextSearchProblem">

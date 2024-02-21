@@ -23,7 +23,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 
 class PoiskActivity : AppCompatActivity() {
-
     private val ITUNES_URL = "https://itunes.apple.com"
     private val retrofit = Retrofit.Builder()
         .baseUrl(ITUNES_URL)
@@ -42,71 +41,116 @@ class PoiskActivity : AppCompatActivity() {
         val buttonSearchBack = findViewById<ImageView>(R.id.settingsBackFromSearch)
         val editText = findViewById<EditText>(R.id.editText)
         val buttonSearchDelete = findViewById<ImageView>(R.id.deleteSearchButton)
-        val placeholderImage = findViewById<ImageView>(R.id.placeholderImage)
+        val placeholderImageNoInternet = findViewById<ImageView>(R.id.noInternetImage)
+        val placeholderImageNothingFound = findViewById<ImageView>(R.id.nothingFoundImage)
         val placeholderText = findViewById<TextView>(R.id.placeholderText)
         val placeholderResetButton = findViewById<Button>(R.id.placeholderResetButton)
 
-        placeholderImage.isVisible = false
+        placeholderImageNoInternet.isVisible = false
+        placeholderImageNothingFound.isVisible = false
         placeholderText.isVisible = false
         placeholderResetButton.isVisible = false
 
-        recycler.adapter = adapter
-        fun searchSong() {
-            if (editText.text.isNotEmpty()) {
-                iTunesService.search(editText.text.toString()).enqueue(object :
-                    Callback<TrackResponse> {
-
-                    @SuppressLint("NotifyDataSetChanged")
-                    override fun onResponse(
-                        call: Call<TrackResponse>,
-                        response: Response<TrackResponse>
-                    ) {
-                        if (response.code() == 200) {
-                            tracks.clear()
-                            placeholderImage.isVisible = false
-                            placeholderText.isVisible = false
-                            if (response.body()?.results?.isNotEmpty() == true) {
-                                tracks.addAll(response.body()?.results!!)
-                                adapter.notifyDataSetChanged()
-                            }
-                            if (tracks.isEmpty()) {
-                                placeholderText.isVisible = true
-                                placeholderImage.isVisible = true
-                                placeholderText.text = getString(R.string.nothingFound)
-                                placeholderImage.setBackgroundResource(R.drawable.nothing_found)
-                            }
-                        } else {
-                            placeholderText.isVisible = true
-                            placeholderImage.isVisible = true
-                            placeholderText.text = getString(R.string.internetProblem)
-                            placeholderImage.setBackgroundResource(R.drawable.no_internet)
-                        }
-                    }
-
-
-                    override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                        placeholderText.isVisible = true
-                        placeholderImage.isVisible = true
-                        placeholderResetButton.isVisible = true
-                        placeholderText.text = getString(R.string.internetProblem)
-                        placeholderImage.setBackgroundResource(R.drawable.no_internet)
-                    }
-                })
-            }
+        fun hidePlaceholder() {
+            placeholderImageNothingFound.isVisible = false
+            placeholderImageNoInternet.isVisible = false
+            placeholderText.isVisible = false
+            placeholderResetButton.isVisible = false
         }
+
+        recycler.adapter = adapter
 
         editText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                searchSong()
+                if (editText.text.isNotEmpty()) {
+                    iTunesService.search(editText.text.toString())
+                        .enqueue(object : Callback<TrackResponse> {
+                            @SuppressLint("NotifyDataSetChanged")
+                            override fun onResponse(
+                                call: Call<TrackResponse>,
+                                response: Response<TrackResponse>
+                            ) {
+                                if (response.code() == Companion.RESPONSE_SUCCESSFULL) {
+                                    tracks.clear()
+                                    hidePlaceholder()
+                                    if (response.body()?.results?.isNotEmpty() == true) {
+                                        tracks.addAll(response.body()?.results!!)
+                                        adapter.notifyDataSetChanged()
+                                    }
+                                    if (tracks.isEmpty()) {
+                                        tracks.clear()
+                                        placeholderText.isVisible = true
+                                        placeholderImageNothingFound.isVisible = true
+                                        placeholderImageNoInternet.isVisible = false
+                                        placeholderText.text = getString(R.string.nothingFound)
+                                        adapter.notifyDataSetChanged()
+                                    }
+                                } else {
+                                    placeholderText.isVisible = true
+                                    placeholderImageNoInternet.isVisible = true
+                                    placeholderImageNothingFound.isVisible = false
+                                    placeholderText.text = getString(R.string.internetProblem)
+                                    placeholderImageNoInternet.setBackgroundResource(R.drawable.no_internet)
+                                }
+                            }
+
+                            override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+                                placeholderText.isVisible = true
+                                placeholderImageNoInternet.isVisible = true
+                                placeholderImageNothingFound.isVisible = false
+                                placeholderResetButton.isVisible = true
+                                placeholderText.text = getString(R.string.internetProblem)
+                            }
+                        })
+                }
             }
             false
         }
 
         placeholderResetButton.setOnClickListener {
-            searchSong()
-            placeholderImage.isVisible = false
-            placeholderText.isVisible = false
-            placeholderResetButton.isVisible = false
+            if (editText.text.isNotEmpty()) {
+                iTunesService.search(editText.text.toString())
+                    .enqueue(object : Callback<TrackResponse> {
+
+                        @SuppressLint("NotifyDataSetChanged")
+                        override fun onResponse(
+                            call: Call<TrackResponse>,
+                            response: Response<TrackResponse>
+                        ) {
+                            if (response.code() == Companion.RESPONSE_SUCCESSFULL) {
+                                tracks.clear()
+                                hidePlaceholder()
+                                if (response.body()?.results?.isNotEmpty() == true) {
+                                    tracks.addAll(response.body()?.results!!)
+                                    adapter.notifyDataSetChanged()
+                                }
+                                if (tracks.isEmpty()) {
+                                    tracks.clear()
+                                    placeholderText.isVisible = true
+                                    placeholderImageNothingFound.isVisible = true
+                                    placeholderImageNoInternet.isVisible = false
+                                    placeholderText.text = getString(R.string.nothingFound)
+                                    adapter.notifyDataSetChanged()
+                                }
+                            } else {
+                                placeholderText.isVisible = true
+                                placeholderImageNoInternet.isVisible = true
+                                placeholderImageNothingFound.isVisible = false
+                                placeholderText.text = getString(R.string.internetProblem)
+                                placeholderImageNoInternet.setBackgroundResource(R.drawable.no_internet)
+                            }
+                        }
+
+                        override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+                            placeholderText.isVisible = true
+                            placeholderImageNoInternet.isVisible = true
+                            placeholderImageNothingFound.isVisible = false
+                            placeholderResetButton.isVisible = true
+                            placeholderText.text = getString(R.string.internetProblem)
+                        }
+                    })
+            }
+            hidePlaceholder()
         }
         editText.isFocusable = true
 
@@ -116,14 +160,14 @@ class PoiskActivity : AppCompatActivity() {
             editText.setText(savedInstanceState.getString(EDIT_TEXT, enterEditText))
         }
 
-        buttonSearchBack.setOnClickListener()
-        {
+        buttonSearchBack.setOnClickListener {
             finish()
         }
 
-        buttonSearchDelete.setOnClickListener()
-        {
+        buttonSearchDelete.setOnClickListener {
             editText.text.clear()
+            hidePlaceholder()
+            placeholderResetButton.isVisible = false
             tracks.clear()
             adapter.notifyDataSetChanged()
         }
@@ -169,10 +213,10 @@ class PoiskActivity : AppCompatActivity() {
 
     }
 
-
     companion object {
         private const val EDIT_TEXT = "TEXT"
         private const val EDIT_TEXT_ENTER = ""
+        private const val RESPONSE_SUCCESSFULL: Int = 200
     }
 
 }
