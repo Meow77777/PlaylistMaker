@@ -52,7 +52,9 @@
             android:layout_height="36dp"
             android:background="@drawable/rounded_edittext"
             android:drawableStart="@drawable/search2"
-            android:hint="@string/search" />
+            android:hint="@string/search"
+            android:imeOptions="actionDone"
+            android:singleLine="true" />
 
         <ImageView
             android:id="@+id/deleteSearchButton"
@@ -64,12 +66,50 @@
 
     </FrameLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/listView"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/padding16"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        android:layout_marginTop="@dimen/padding16">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:backgroundTintMode="@color/white"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="86dp">
+
+            <ImageView
+                android:id="@+id/noInternetImage"
+                style="@style/NoInternetImage" />
+
+            <ImageView
+                android:id="@+id/nothingFoundImage"
+                style="@style/NothingFoundImage" />
+
+            <TextView
+                android:id="@+id/placeholderText"
+                style="@style/TextSearchProblem"
+                android:layout_marginHorizontal="@dimen/size24"
+                android:layout_marginTop="@dimen/size136"
+                tools:text="Ничего не нашлось"
+
+                />
+        </FrameLayout>
+
+        <Button
+            android:id="@+id/placeholderResetButton"
+            style="@style/ResetButtonSearch"
+
+            />
+
+
+    </FrameLayout>
 
 
 </LinearLayout>

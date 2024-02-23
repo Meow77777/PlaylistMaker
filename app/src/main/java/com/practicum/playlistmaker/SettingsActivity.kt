@@ -1,22 +1,20 @@
 package com.practicum.playlistmaker
 
+import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.BoringLayout
-import android.widget.Button
-import android.widget.CompoundButton
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Switch
-import android.widget.TextView
-import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.app.AppCompatActivity
+
+const val MY_PREFS: String = "switch_prefs"
+const val SWITCH_STATUS: String = "switch_status"
 
 class SettingsActivity : AppCompatActivity() {
 
-
+    @SuppressLint("UseSwitchCompatOrMaterialCode")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
@@ -28,42 +26,32 @@ class SettingsActivity : AppCompatActivity() {
         val switchThemeButton = findViewById<Switch>(R.id.switchTheme)
 
         val switchStatus: Boolean
-        val darkStatus: Boolean
+
 
         val prefsSetting = getSharedPreferences(MY_PREFS, MODE_PRIVATE)
         val editorSettings = prefsSetting.edit()
 
         switchStatus = prefsSetting.getBoolean(SWITCH_STATUS, false)
-        darkStatus = prefsSetting.getBoolean(DARK_THEME_STATUS, false)
+
 
         switchThemeButton.isChecked = switchStatus
 
-        if (darkStatus) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        switchThemeButton.setOnCheckedChangeListener { switcher, checked ->
+            if (checked) {
+                editorSettings.putBoolean(SWITCH_STATUS, true)
+                editorSettings.apply()
+                switchThemeButton.isChecked = true
+            } else {
+                editorSettings.putBoolean(SWITCH_STATUS, false)
+                editorSettings.apply()
+                switchThemeButton.isChecked = false
+            }
+            (applicationContext as App).switchTheme(checked)
         }
 
         buttonSettingsBack.setOnClickListener {
             finish()
         }
-
-        switchThemeButton.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                editorSettings.putBoolean(SWITCH_STATUS, true)
-                editorSettings.putBoolean(DARK_THEME_STATUS, true)
-                editorSettings.apply()
-                switchThemeButton.isChecked = true
-            } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                editorSettings.putBoolean(SWITCH_STATUS, false)
-                editorSettings.putBoolean(DARK_THEME_STATUS, false)
-                editorSettings.apply()
-                switchThemeButton.isChecked = false
-            }
-        }
-
         buttonUserAgreement.setOnClickListener {
             val linkAgreement: String = resources.getString(R.string.agreementLink)
             val url = Uri.parse(linkAgreement)
@@ -97,9 +85,5 @@ class SettingsActivity : AppCompatActivity() {
 
     }
 
-    companion object {
-        const val MY_PREFS: String = "switch_prefs"
-        const val SWITCH_STATUS: String = "switch_status"
-        const val DARK_THEME_STATUS: String = "light_theme_status"
-    }
+
 }

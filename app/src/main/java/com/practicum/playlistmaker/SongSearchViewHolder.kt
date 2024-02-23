@@ -26,7 +26,7 @@ class SongSearchViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     fun bind(model: Track) {
         trackNameView.text = model.trackName
         artistNameView.text = model.artistName
-        trackTimeView.text = model.trackTime
+        trackTimeView.text = DateTimeUtil.timeConvert(model.trackTimeMillis.toLong())
         Glide.with(itemView).load(model.artworkUrl100).centerCrop()
             .placeholder(R.drawable.placeholder)
             .transform(RoundedCorners(dpToPx(2f, itemView.context)))
@@ -41,4 +41,6 @@ class SongSearchViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             context.resources.displayMetrics
         ).toInt()
     }
+
+
 }
