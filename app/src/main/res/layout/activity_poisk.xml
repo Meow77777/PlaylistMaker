@@ -78,6 +78,33 @@
             android:backgroundTintMode="@color/white"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/youSearched"
+                style="@style/YouSearchedText" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerSearchHistory"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/padding8"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/deleteSearchHistory"
+                style="@style/ResetButtonSearch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/size24"
+                android:layout_marginBottom="@dimen/size32"
+                android:text="@string/deleteHistory" />
+        </LinearLayout>
+
+
         <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -23,4 +23,6 @@
     <dimen name="size54">54dp</dimen>
     <dimen name="size334">334dp</dimen>
     <dimen name="text_size_14">14sp</dimen>
+    <dimen name="size32">32dp</dimen>
+    <dimen name="text_size_19">19sp</dimen>
 </resources>
