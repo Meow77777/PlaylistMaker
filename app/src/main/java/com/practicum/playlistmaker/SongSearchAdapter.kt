@@ -1,13 +1,16 @@
 package com.practicum.playlistmaker
 
+import android.content.Intent
 import android.content.SharedPreferences
+import android.media.MediaPlayer.TrackInfo
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
 class SongSearchAdapter(
     private val tracks: List<Track>,
-    private val sharedPreferences: SharedPreferences
+    sharedPreferences: SharedPreferences,
+    val listener: Listener
 ) :
     RecyclerView.Adapter<SongSearchViewHolder>() {
     val searchHistory: SearchHistory = SearchHistory(sharedPreferences)
@@ -18,14 +21,16 @@ class SongSearchAdapter(
     }
 
     override fun onBindViewHolder(holder: SongSearchViewHolder, position: Int) {
-        holder.bind(tracks[position])
-        holder.itemView.setOnClickListener {
-            searchHistory.addTrack(tracks[position])
-        }
+        holder.bind(tracks[position],listener)
     }
 
     override fun getItemCount(): Int {
         return tracks.size
+    }
+
+    interface Listener {
+        fun onClick(track: Track)
+
     }
 
 }

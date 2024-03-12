@@ -2,6 +2,7 @@ package com.practicum.playlistmaker
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
@@ -12,14 +13,13 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -27,7 +27,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 
-class PoiskActivity : AppCompatActivity() {
+class PoiskActivity : AppCompatActivity(), SongSearchAdapter.Listener {
 
     companion object {
         private const val EDIT_TEXT = "TEXT"
@@ -75,14 +75,16 @@ class PoiskActivity : AppCompatActivity() {
 
         val sharedPreferences: SharedPreferences = getSharedPreferences(PREFS_HISTORY, MODE_PRIVATE)
         val searchHistory = SearchHistory(sharedPreferences)
-        val adapter = SongSearchAdapter(tracks, sharedPreferences)
+        val adapter = SongSearchAdapter(tracks, sharedPreferences, this)
         recycler.adapter = adapter
         searchHistory.getTracksList()
 
-        val adapterHistory = AdapterHistoryTracks(searchHistory.historyList)
+        val adapterHistory = AdapterHistoryTracks(searchHistory.historyList, this)
         recyclerSearchHistory.adapter = adapterHistory
         recyclerSearchHistory.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+
+
 
         editText.setOnFocusChangeListener { view, hasFocus ->
             youSearchedText.visibility =
@@ -225,7 +227,7 @@ class PoiskActivity : AppCompatActivity() {
             placeholderResetButton.isVisible = false
             tracks.clear()
             searchHistory.getTracksList()
-            val adapterHistory = AdapterHistoryTracks(searchHistory.historyList)
+            val adapterHistory = AdapterHistoryTracks(searchHistory.historyList, this)
             recyclerSearchHistory.adapter = adapterHistory
             adapterHistory.notifyDataSetChanged()
             adapter.notifyDataSetChanged()
@@ -281,6 +283,22 @@ class PoiskActivity : AppCompatActivity() {
         super.onRestoreInstanceState(savedInstanceState)
         enterEditText = savedInstanceState.getString(EDIT_TEXT, enterEditText)
 
+    }
+
+    override fun onClick(track: Track) {
+        val sharedPreferences: SharedPreferences = getSharedPreferences(PREFS_HISTORY, MODE_PRIVATE)
+        val searchHistory = SearchHistory(sharedPreferences)
+        searchHistory.addTrack(track)
+        val trackInfoActivityIntent = Intent(this, TrackInfoActivity::class.java)
+        trackInfoActivityIntent.putExtra("trackName", track.trackName)
+        trackInfoActivityIntent.putExtra("authorName", track.artistName)
+        trackInfoActivityIntent.putExtra("trackLength", track.trackTimeMillis)
+        trackInfoActivityIntent.putExtra("trackImage", track.artworkUrl100)
+        trackInfoActivityIntent.putExtra("collectionName", track.collectionName)
+        trackInfoActivityIntent.putExtra("releaseDate", track.releaseDate)
+        trackInfoActivityIntent.putExtra("primaryGenreName", track.primaryGenreName)
+        trackInfoActivityIntent.putExtra("country", track.country)
+        startActivity(trackInfoActivityIntent)
     }
 
 }
