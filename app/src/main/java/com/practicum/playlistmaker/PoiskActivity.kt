@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -13,12 +15,14 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Recycler
 import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
@@ -37,6 +41,7 @@ class PoiskActivity : AppCompatActivity(), SongSearchAdapter.Listener {
         const val PREFS_HISTORY = "prefs_history"
     }
 
+    lateinit var editText: EditText
     private val ITUNES_URL = "https://itunes.apple.com"
     private val retrofit = Retrofit.Builder()
         .baseUrl(ITUNES_URL)
@@ -46,22 +51,41 @@ class PoiskActivity : AppCompatActivity(), SongSearchAdapter.Listener {
     private val iTunesService = retrofit.create(TrackApi::class.java)
     private val tracks = ArrayList<Track>()
 
+    lateinit var sharedPreferences: SharedPreferences
+    lateinit var adapter: SongSearchAdapter
+    lateinit var placeholderText: TextView
+    lateinit var placeholderImageNoInternet: ImageView
+    lateinit var placeholderImageNothingFound: ImageView
+    lateinit var placeholderResetButton: Button
+    lateinit var recycler: RecyclerView
+    lateinit var recyclerSearchHistory: RecyclerView
+    lateinit var progressBar: ProgressBar
+
+    private lateinit var searchHistory: SearchHistory
+    lateinit var adapterHistory: AdapterHistoryTracks
+
+    private val searchRunnable = Runnable { searchRequest() }
+    private val handler = Handler(Looper.getMainLooper())
+
+    private var isClickAllowed = true
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_poisk)
-        val recycler = findViewById<RecyclerView>(R.id.listView)
+        recycler = findViewById<RecyclerView>(R.id.listView)
         val buttonSearchBack = findViewById<ImageView>(R.id.settingsBackFromSearch)
-        val editText = findViewById<EditText>(R.id.editText)
+        editText = findViewById<EditText>(R.id.editText)
         val buttonSearchDelete = findViewById<ImageView>(R.id.deleteSearchButton)
-        val placeholderImageNoInternet = findViewById<ImageView>(R.id.noInternetImage)
-        val placeholderImageNothingFound = findViewById<ImageView>(R.id.nothingFoundImage)
-        val placeholderText = findViewById<TextView>(R.id.placeholderText)
-        val placeholderResetButton = findViewById<Button>(R.id.placeholderResetButton)
+        placeholderImageNoInternet = findViewById<ImageView>(R.id.noInternetImage)
+        placeholderImageNothingFound = findViewById<ImageView>(R.id.nothingFoundImage)
+        placeholderText = findViewById<TextView>(R.id.placeholderText)
+        placeholderResetButton = findViewById<Button>(R.id.placeholderResetButton)
         val youSearchedText = findViewById<TextView>(R.id.youSearched)
-        val recyclerSearchHistory = findViewById<RecyclerView>(R.id.recyclerSearchHistory)
+        recyclerSearchHistory = findViewById<RecyclerView>(R.id.recyclerSearchHistory)
         val deleteSearchHistory = findViewById<Button>(R.id.deleteSearchHistory)
+        progressBar = findViewById(R.id.progressBar)
+
 
 
         placeholderImageNoInternet.isVisible = false
@@ -72,14 +96,15 @@ class PoiskActivity : AppCompatActivity(), SongSearchAdapter.Listener {
         deleteSearchHistory.isVisible = false
         recyclerSearchHistory.isVisible = false
 
+        sharedPreferences = getSharedPreferences(PREFS_HISTORY, MODE_PRIVATE)
+        adapter = SongSearchAdapter(tracks, sharedPreferences, this)
 
-        val sharedPreferences: SharedPreferences = getSharedPreferences(PREFS_HISTORY, MODE_PRIVATE)
-        val searchHistory = SearchHistory(sharedPreferences)
-        val adapter = SongSearchAdapter(tracks, sharedPreferences, this)
+        searchHistory = SearchHistory(sharedPreferences)
+
         recycler.adapter = adapter
         searchHistory.getTracksList()
 
-        val adapterHistory = AdapterHistoryTracks(searchHistory.historyList, this)
+        adapterHistory = AdapterHistoryTracks(searchHistory.historyList, this)
         recyclerSearchHistory.adapter = adapterHistory
         recyclerSearchHistory.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
@@ -97,12 +122,7 @@ class PoiskActivity : AppCompatActivity(), SongSearchAdapter.Listener {
 
 
 
-        fun hidePlaceholder() {
-            placeholderImageNothingFound.isVisible = false
-            placeholderImageNoInternet.isVisible = false
-            placeholderText.isVisible = false
-            placeholderResetButton.isVisible = false
-        }
+
 
         deleteSearchHistory.setOnClickListener {
             searchHistory.historyList.clear()
@@ -118,95 +138,12 @@ class PoiskActivity : AppCompatActivity(), SongSearchAdapter.Listener {
 
 
         editText.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                if (editText.text.isNotEmpty()) {
-                    iTunesService.search(editText.text.toString())
-                        .enqueue(object : Callback<TrackResponse> {
-                            @SuppressLint("NotifyDataSetChanged")
-                            override fun onResponse(
-                                call: Call<TrackResponse>,
-                                response: Response<TrackResponse>
-                            ) {
-                                if (response.code() == Companion.RESPONSE_SUCCESSFULL) {
-                                    tracks.clear()
-                                    hidePlaceholder()
-                                    if (response.body()?.results?.isNotEmpty() == true) {
-                                        tracks.addAll(response.body()?.results!!)
-                                        adapter.notifyDataSetChanged()
-                                    }
-                                    if (tracks.isEmpty()) {
-                                        tracks.clear()
-                                        placeholderText.isVisible = true
-                                        placeholderImageNothingFound.isVisible = true
-                                        placeholderImageNoInternet.isVisible = false
-                                        placeholderText.text = getString(R.string.nothingFound)
-                                        adapter.notifyDataSetChanged()
-                                    }
-                                } else {
-                                    placeholderText.isVisible = true
-                                    placeholderImageNoInternet.isVisible = true
-                                    placeholderImageNothingFound.isVisible = false
-                                    placeholderText.text = getString(R.string.internetProblem)
-                                    placeholderImageNoInternet.setBackgroundResource(R.drawable.no_internet)
-                                }
-                            }
-
-                            override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                                placeholderText.isVisible = true
-                                placeholderImageNoInternet.isVisible = true
-                                placeholderImageNothingFound.isVisible = false
-                                placeholderResetButton.isVisible = true
-                                placeholderText.text = getString(R.string.internetProblem)
-                            }
-                        })
-                }
-            }
+            searchRequest()
             false
         }
 
         placeholderResetButton.setOnClickListener {
-            if (editText.text.isNotEmpty()) {
-                iTunesService.search(editText.text.toString())
-                    .enqueue(object : Callback<TrackResponse> {
-
-                        @SuppressLint("NotifyDataSetChanged")
-                        override fun onResponse(
-                            call: Call<TrackResponse>,
-                            response: Response<TrackResponse>
-                        ) {
-                            if (response.code() == Companion.RESPONSE_SUCCESSFULL) {
-                                tracks.clear()
-                                hidePlaceholder()
-                                if (response.body()?.results?.isNotEmpty() == true) {
-                                    tracks.addAll(response.body()?.results!!)
-                                    adapter.notifyDataSetChanged()
-                                }
-                                if (tracks.isEmpty()) {
-                                    tracks.clear()
-                                    placeholderText.isVisible = true
-                                    placeholderImageNothingFound.isVisible = true
-                                    placeholderImageNoInternet.isVisible = false
-                                    placeholderText.text = getString(R.string.nothingFound)
-                                    adapter.notifyDataSetChanged()
-                                }
-                            } else {
-                                placeholderText.isVisible = true
-                                placeholderImageNoInternet.isVisible = true
-                                placeholderImageNothingFound.isVisible = false
-                                placeholderText.text = getString(R.string.internetProblem)
-                                placeholderImageNoInternet.setBackgroundResource(R.drawable.no_internet)
-                            }
-                        }
-
-                        override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                            placeholderText.isVisible = true
-                            placeholderImageNoInternet.isVisible = true
-                            placeholderImageNothingFound.isVisible = false
-                            placeholderResetButton.isVisible = true
-                            placeholderText.text = getString(R.string.internetProblem)
-                        }
-                    })
-            }
+            searchRequest()
             hidePlaceholder()
         }
         editText.isFocusable = true
@@ -226,10 +163,9 @@ class PoiskActivity : AppCompatActivity(), SongSearchAdapter.Listener {
             hidePlaceholder()
             placeholderResetButton.isVisible = false
             tracks.clear()
-            searchHistory.getTracksList()
-            val adapterHistory = AdapterHistoryTracks(searchHistory.historyList, this)
-            recyclerSearchHistory.adapter = adapterHistory
-            adapterHistory.notifyDataSetChanged()
+
+            notifyHistoryAdapter()
+
             adapter.notifyDataSetChanged()
         }
 
@@ -239,22 +175,29 @@ class PoiskActivity : AppCompatActivity(), SongSearchAdapter.Listener {
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                searchDebounce()
                 if (p0.isNullOrEmpty()) {
                     buttonSearchDelete.isVisible = false
                     closeKeyboard(editText)
+                    recycler.isVisible = false
                 } else {
                     buttonSearchDelete.isVisible = true
+                    recycler.isVisible = true
                     enterEditText = editText.text.toString()
                 }
 
-                if (editText.hasFocusable() && (p0?.isEmpty() == true)) {
+                if (editText.hasFocusable() && (p0?.isEmpty() == true) && (searchHistory.historyList.isNotEmpty())) {
                     youSearchedText.isVisible = true
                     deleteSearchHistory.isVisible = true
+                    recycler.isVisible = false
+                    notifyHistoryAdapter()
                     recyclerSearchHistory.isVisible = true
                 } else {
                     youSearchedText.isVisible = false
                     deleteSearchHistory.isVisible = false
                     recyclerSearchHistory.isVisible = false
+
+
                 }
             }
 
@@ -266,6 +209,13 @@ class PoiskActivity : AppCompatActivity(), SongSearchAdapter.Listener {
 
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    private fun notifyHistoryAdapter() {
+        searchHistory.getTracksList()
+        adapterHistory = AdapterHistoryTracks(searchHistory.historyList, this)
+        recyclerSearchHistory.adapter = adapterHistory
+        adapterHistory.notifyDataSetChanged()
+    }
 
     private fun closeKeyboard(view: View) {
         val inputMethodManager =
@@ -285,20 +235,94 @@ class PoiskActivity : AppCompatActivity(), SongSearchAdapter.Listener {
 
     }
 
+    private fun hidePlaceholder() {
+        placeholderImageNothingFound.isVisible = false
+        placeholderImageNoInternet.isVisible = false
+        placeholderText.isVisible = false
+        placeholderResetButton.isVisible = false
+    }
+
+    private fun searchRequest() {
+        if (editText.text.isNotEmpty()) {
+            progressBar.visibility = View.VISIBLE
+            recycler.visibility = View.GONE
+            iTunesService.search(editText.text.toString())
+                .enqueue(object : Callback<TrackResponse> {
+
+                    @SuppressLint("NotifyDataSetChanged")
+                    override fun onResponse(
+                        call: Call<TrackResponse>,
+                        response: Response<TrackResponse>
+                    ) {
+                        progressBar.visibility = View.GONE
+                        recycler.visibility = View.VISIBLE
+                        if (response.code() == Companion.RESPONSE_SUCCESSFULL) {
+                            tracks.clear()
+                            hidePlaceholder()
+                            if (response.body()?.results?.isNotEmpty() == true) {
+                                tracks.addAll(response.body()?.results!!)
+                                adapter.notifyDataSetChanged()
+                            }
+                            if (tracks.isEmpty()) {
+                                tracks.clear()
+                                placeholderText.isVisible = true
+                                placeholderImageNothingFound.isVisible = true
+                                placeholderImageNoInternet.isVisible = false
+                                placeholderText.text = getString(R.string.nothingFound)
+                                adapter.notifyDataSetChanged()
+                            }
+                        } else {
+                            placeholderText.isVisible = true
+                            placeholderImageNoInternet.isVisible = true
+                            placeholderImageNothingFound.isVisible = false
+                            placeholderText.text = getString(R.string.internetProblem)
+                            placeholderImageNoInternet.setBackgroundResource(R.drawable.no_internet)
+                        }
+                    }
+
+                    override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+                        progressBar.visibility = View.GONE
+                        placeholderText.isVisible = true
+                        placeholderImageNoInternet.isVisible = true
+                        placeholderImageNothingFound.isVisible = false
+                        placeholderResetButton.isVisible = true
+                        placeholderText.text = getString(R.string.internetProblem)
+                    }
+                })
+        }
+    }
+
+    private fun searchDebounce() {
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, 2000)
+    }
+
+    private fun clickDebounce(): Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed({ isClickAllowed = true }, 1000L)
+        }
+        return current
+    }
+
     override fun onClick(track: Track) {
         val sharedPreferences: SharedPreferences = getSharedPreferences(PREFS_HISTORY, MODE_PRIVATE)
         val searchHistory = SearchHistory(sharedPreferences)
         searchHistory.addTrack(track)
-        val trackInfoActivityIntent = Intent(this, TrackInfoActivity::class.java)
-        trackInfoActivityIntent.putExtra("trackName", track.trackName)
-        trackInfoActivityIntent.putExtra("authorName", track.artistName)
-        trackInfoActivityIntent.putExtra("trackLength", track.trackTimeMillis)
-        trackInfoActivityIntent.putExtra("trackImage", track.artworkUrl100)
-        trackInfoActivityIntent.putExtra("collectionName", track.collectionName)
-        trackInfoActivityIntent.putExtra("releaseDate", track.releaseDate)
-        trackInfoActivityIntent.putExtra("primaryGenreName", track.primaryGenreName)
-        trackInfoActivityIntent.putExtra("country", track.country)
-        startActivity(trackInfoActivityIntent)
+        if (clickDebounce()) {
+            val trackInfoActivityIntent = Intent(this, TrackInfoActivity::class.java)
+            trackInfoActivityIntent.putExtra("trackName", track.trackName)
+            trackInfoActivityIntent.putExtra("authorName", track.artistName)
+            trackInfoActivityIntent.putExtra("trackLength", track.trackTimeMillis)
+            trackInfoActivityIntent.putExtra("trackImage", track.artworkUrl100)
+            trackInfoActivityIntent.putExtra("collectionName", track.collectionName)
+            trackInfoActivityIntent.putExtra("releaseDate", track.releaseDate)
+            trackInfoActivityIntent.putExtra("primaryGenreName", track.primaryGenreName)
+            trackInfoActivityIntent.putExtra("country", track.country)
+            trackInfoActivityIntent.putExtra("previewUrl", track.previewUrl)
+            startActivity(trackInfoActivityIntent)
+        }
     }
 
 }

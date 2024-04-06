@@ -103,7 +103,8 @@
         app:layout_constraintEnd_toEndOf="@id/playButtonTrackInfo"
         app:layout_constraintStart_toStartOf="@id/playButtonTrackInfo"
         app:layout_constraintTop_toBottomOf="@id/playButtonTrackInfo"
-        tools:text="0:30" />
+        android:visibility="visible"
+        android:text="@string/songZero" />
 
     <TextView
         android:id="@+id/songLengthTitleTrackInfo"

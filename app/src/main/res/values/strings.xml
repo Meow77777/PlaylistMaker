@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Playlist Maker</string>
+    <string name="app_name">Playlist maker</string>
     <string name="poisk">Поиск</string>
     <string name="mediateka">Медиатека</string>
     <string name="settings">Настройки</string>
@@ -26,4 +26,5 @@
     <string name="songYear">Год</string>
     <string name="songGenre">Жанр</string>
     <string name="songCountry">Страна</string>
+    <string name="songZero">00:00</string>
 </resources>
