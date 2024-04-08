@@ -35,7 +35,7 @@ class TrackInfoActivity : AppCompatActivity() {
     private var mediaPlayer = MediaPlayer()
 
     private var mainThreadHandler: Handler? = null
-
+    private val dateFormat by lazy { SimpleDateFormat("mm:ss", Locale.getDefault()) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,34 +54,27 @@ class TrackInfoActivity : AppCompatActivity() {
         timerTextView = findViewById(R.id.songCurrentTimeTrackInfo)
 
 
-        val trackNameIntent = intent.getStringExtra("trackName")
-        val authorNameIntent = intent.getStringExtra("authorName")
-        val trackLengthIntent = intent.getStringExtra("trackLength")
-        val trackImageIntent = intent.getStringExtra("trackImage")
-        val collectionNameIntent = intent.getStringExtra("collectionName")
-        val releaseDateIntent = intent.getStringExtra("releaseDate")
-        val primaryGenreNameIntent = intent.getStringExtra("primaryGenreName")
-        val countryIntent = intent.getStringExtra("country")
-        previewUrlIntent = intent.getStringExtra("previewUrl").toString()
+        val trackIntent: Track = intent.getParcelableExtra("track")!!
 
         mainThreadHandler = Handler(Looper.getMainLooper())
 
-
-
-        preparePlayer()
-
-        trackName.text = trackNameIntent
-        authorName.text = authorNameIntent
-        trackLength.text = DateTimeUtil.timeConvert(trackLengthIntent!!.toLong())
-        Glide.with(trackImage).load(trackImageIntent!!.replaceAfterLast('/', "512x512bb.jpg"))
+        previewUrlIntent = trackIntent.previewUrl.toString()
+        trackName.text = trackIntent.trackName
+        authorName.text = trackIntent.artistName
+        trackLength.text = DateTimeUtil.timeConvert(trackIntent.trackTimeMillis!!.toLong())
+        Glide.with(trackImage)
+            .load(trackIntent.artworkUrl100!!.replaceAfterLast('/', "512x512bb.jpg"))
             .centerCrop()
             .placeholder(R.drawable.placeholder)
             .transform(RoundedCorners(DateTimeUtil.dpToPx(8f, this)))
             .into(trackImage)
-        if (!collectionNameIntent.isNullOrEmpty()) collectionName.text = collectionNameIntent
-        releaseDate.text = releaseDateIntent!!.subSequence(IntRange(0, 3))
-        primaryGenreName.text = primaryGenreNameIntent
-        country.text = countryIntent
+        if (!trackIntent.collectionName.isNullOrEmpty()) collectionName.text =
+            trackIntent.collectionName
+        releaseDate.text = trackIntent.releaseDate!!.subSequence(IntRange(0, 3))
+        primaryGenreName.text = trackIntent.primaryGenreName
+        country.text = trackIntent.country
+
+        preparePlayer()
 
         play.setOnClickListener {
             playbackControl()
@@ -112,11 +105,10 @@ class TrackInfoActivity : AppCompatActivity() {
 
                 try {
                     if ((mediaPlayer.currentPosition <= mediaPlayer.duration) and (mediaPlayer.isPlaying)) {
-                        timerTextView.text = SimpleDateFormat(
-                            "mm:ss",
-                            Locale.getDefault()
-                        ).format(mediaPlayer.currentPosition)
-                        mainThreadHandler?.postDelayed(this, 0L)
+
+                        timerTextView.text = dateFormat.format(mediaPlayer.currentPosition)
+
+                        mainThreadHandler?.postDelayed(this, 500L)
                     }
 
                 } catch (e: IllegalStateException) {

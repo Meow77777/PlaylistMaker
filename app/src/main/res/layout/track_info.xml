@@ -100,11 +100,11 @@
     <TextView
         android:id="@+id/songCurrentTimeTrackInfo"
         style="@style/SongTimeTrackInfo"
+        android:text="@string/songZero"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="@id/playButtonTrackInfo"
         app:layout_constraintStart_toStartOf="@id/playButtonTrackInfo"
-        app:layout_constraintTop_toBottomOf="@id/playButtonTrackInfo"
-        android:visibility="visible"
-        android:text="@string/songZero" />
+        app:layout_constraintTop_toBottomOf="@id/playButtonTrackInfo" />
 
     <TextView
         android:id="@+id/songLengthTitleTrackInfo"
@@ -119,6 +119,7 @@
         style="@style/TitleTrackInfoValue"
         android:layout_marginTop="38dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/songLengthTitleTrackInfo"
         app:layout_constraintTop_toBottomOf="@id/songCurrentTimeTrackInfo"
         tools:text="5:35" />
 
@@ -139,7 +140,11 @@
     <TextView
         android:id="@+id/songAlbumTrackInfo"
         style="@style/TitleTrackInfoValue"
+
+
         app:layout_constraintEnd_toEndOf="parent"
+
+        app:layout_constraintStart_toEndOf="@id/songLengthTitleTrackInfo"
         app:layout_constraintTop_toBottomOf="@id/songLengthTrackInfo"
         tools:text="Yesterday (Remastered 2009)" />
 
@@ -148,12 +153,14 @@
         style="@style/TitleTrackInfo"
         android:text="@string/songYear"
         app:layout_constraintStart_toStartOf="parent"
+
         app:layout_constraintTop_toBottomOf="@id/songAlbumTitleTrackInfo" />
 
     <TextView
         android:id="@+id/songYearTrackInfo"
         style="@style/TitleTrackInfoValue"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/songLengthTitleTrackInfo"
         app:layout_constraintTop_toBottomOf="@id/songAlbumTrackInfo"
         tools:text="1969" />
 
@@ -168,6 +175,7 @@
         android:id="@+id/songGenreTrackInfo"
         style="@style/TitleTrackInfoValue"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/songLengthTitleTrackInfo"
         app:layout_constraintTop_toBottomOf="@id/songYearTrackInfo"
         tools:text="Rock" />
 
@@ -186,6 +194,7 @@
         android:layout_marginBottom="@dimen/size28dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/songLengthTitleTrackInfo"
         app:layout_constraintTop_toBottomOf="@id/songGenreTrackInfo"
         tools:text="Великобритания" />
 

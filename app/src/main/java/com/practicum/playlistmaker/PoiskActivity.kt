@@ -29,6 +29,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 class PoiskActivity : AppCompatActivity(), SongSearchAdapter.Listener {
@@ -293,7 +295,6 @@ class PoiskActivity : AppCompatActivity(), SongSearchAdapter.Listener {
     }
 
     private fun searchDebounce() {
-        handler.removeCallbacks(searchRunnable)
         handler.postDelayed(searchRunnable, 2000)
     }
 
@@ -312,17 +313,14 @@ class PoiskActivity : AppCompatActivity(), SongSearchAdapter.Listener {
         searchHistory.addTrack(track)
         if (clickDebounce()) {
             val trackInfoActivityIntent = Intent(this, TrackInfoActivity::class.java)
-            trackInfoActivityIntent.putExtra("trackName", track.trackName)
-            trackInfoActivityIntent.putExtra("authorName", track.artistName)
-            trackInfoActivityIntent.putExtra("trackLength", track.trackTimeMillis)
-            trackInfoActivityIntent.putExtra("trackImage", track.artworkUrl100)
-            trackInfoActivityIntent.putExtra("collectionName", track.collectionName)
-            trackInfoActivityIntent.putExtra("releaseDate", track.releaseDate)
-            trackInfoActivityIntent.putExtra("primaryGenreName", track.primaryGenreName)
-            trackInfoActivityIntent.putExtra("country", track.country)
-            trackInfoActivityIntent.putExtra("previewUrl", track.previewUrl)
+            trackInfoActivityIntent.putExtra("track", track)
             startActivity(trackInfoActivityIntent)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacks(searchRunnable)
     }
 
 }
