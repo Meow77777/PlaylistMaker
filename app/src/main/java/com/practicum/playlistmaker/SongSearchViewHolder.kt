@@ -23,20 +23,18 @@ class SongSearchViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
 
 
-    fun bind(model: Track,listener:SongSearchAdapter.Listener) {
+    fun bind(model: Track, listener: SongSearchAdapter.Listener) {
         trackNameView.text = model.trackName
         artistNameView.text = model.artistName
-        trackTimeView.text = DateTimeUtil.timeConvert(model.trackTimeMillis.toLong())
+        trackTimeView.text = DateTimeUtil.timeConvert(model.trackTimeMillis!!.toLong())
         Glide.with(itemView).load(model.artworkUrl100).centerCrop()
             .placeholder(R.drawable.placeholder)
             .transform(RoundedCorners(DateTimeUtil.dpToPx(2f, itemView.context)))
             .into(artworkUrl100View)
-        itemView.setOnClickListener{
+        itemView.setOnClickListener {
             listener.onClick(model)
         }
     }
-
-
 
 
 }
