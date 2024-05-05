@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.ui.search_activity
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -10,27 +10,27 @@ import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.Recycler
 import com.google.gson.Gson
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.data.dto.TrackResponse
+import com.practicum.playlistmaker.data.network.TrackApi
+import com.practicum.playlistmaker.domain.models.Track
+import com.practicum.playlistmaker.ui.track_info_activity.TrackInfoActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 
 class PoiskActivity : AppCompatActivity(), SongSearchAdapter.Listener {
@@ -256,12 +256,13 @@ class PoiskActivity : AppCompatActivity(), SongSearchAdapter.Listener {
                         call: Call<TrackResponse>,
                         response: Response<TrackResponse>
                     ) {
-                        progressBar.visibility = View.GONE
-                        recycler.visibility = View.VISIBLE
-                        if (response.code() == Companion.RESPONSE_SUCCESSFULL) {
+
+                        if (response.code() == RESPONSE_SUCCESSFULL) {
                             tracks.clear()
                             hidePlaceholder()
                             if (response.body()?.results?.isNotEmpty() == true) {
+                                progressBar.visibility = View.GONE
+                                recycler.visibility = View.VISIBLE
                                 tracks.addAll(response.body()?.results!!)
                                 adapter.notifyDataSetChanged()
                             }
@@ -295,7 +296,7 @@ class PoiskActivity : AppCompatActivity(), SongSearchAdapter.Listener {
     }
 
     private fun searchDebounce() {
-        handler.postDelayed(searchRunnable, 2000)
+        handler.postDelayed(searchRunnable, 500)
     }
 
     private fun clickDebounce(): Boolean {

@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.ui.settings_activity
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -8,6 +8,8 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Switch
 import androidx.appcompat.app.AppCompatActivity
+import com.practicum.playlistmaker.App
+import com.practicum.playlistmaker.R
 
 const val MY_PREFS: String = "switch_prefs"
 const val SWITCH_STATUS: String = "switch_status"
