@@ -2,6 +2,8 @@ package com.practicum.playlistmaker
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
+import com.practicum.playlistmaker.ui.settings_activity.MY_PREFS
+import com.practicum.playlistmaker.ui.settings_activity.SWITCH_STATUS
 
 class App : Application() {
 
