@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:name="com.practicum.playlistmaker.App"
+        android:name="com.practicum.playlistmaker.utils.App"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -14,19 +14,19 @@
         android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"
         tools:targetApi="31">
         <activity
-            android:name=".ui.track_info_activity.TrackInfoActivity"
+            android:name=".player.ui.TrackInfoActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.settings_activity.SettingsActivity"
+            android:name=".settings.ui.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.search_activity.PoiskActivity"
+            android:name=".search.ui.SearchActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.mediateka_activity.MediatekaActivity"
+            android:name=".mediateka.ui.MediatekaActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.main_activity.MainActivity"
+            android:name=".main.ui.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
