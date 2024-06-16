@@ -27,6 +27,7 @@ import com.practicum.playlistmaker.player.ui.TrackInfoActivity
 import com.practicum.playlistmaker.search.models.Track
 import com.practicum.playlistmaker.search.presentation.SearchTracksViewModel
 import com.practicum.playlistmaker.search.presentation.state.TracksState
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class SearchActivity : AppCompatActivity() {
@@ -61,7 +62,9 @@ class SearchActivity : AppCompatActivity() {
 
     private var isClickAllowed = true
 
-    private lateinit var viewModel: SearchTracksViewModel
+    private val vm by viewModel<SearchTracksViewModel>()
+
+    //private lateinit var viewModel: SearchTracksViewModel
     private lateinit var searchText: String
     private lateinit var tracksListHistory: MutableList<Track>
 
@@ -82,10 +85,10 @@ class SearchActivity : AppCompatActivity() {
         deleteSearchHistory = findViewById<Button>(R.id.deleteSearchHistory)
         progressBar = findViewById(R.id.progressBar)
 
-        viewModel = ViewModelProvider(
-            this,
-            SearchTracksViewModel.getViewModelFactory()
-        )[SearchTracksViewModel::class.java]
+//        vm = ViewModelProvider(
+//            this,
+//            SearchTracksViewModel.getViewModelFactory()
+//        )[SearchTracksViewModel::class.java]
 
         placeholderImageNoInternet.isVisible = false
         placeholderImageNothingFound.isVisible = false
@@ -100,7 +103,7 @@ class SearchActivity : AppCompatActivity() {
 
         tracksListHistory = mutableListOf()
 
-        viewModel.getHistoryTracksLiveData().observe(this) { listOfHistoryTracks ->
+        vm.getHistoryTracksLiveData().observe(this) { listOfHistoryTracks ->
             tracksListHistory = listOfHistoryTracks
         }
 
@@ -126,7 +129,7 @@ class SearchActivity : AppCompatActivity() {
                     val trackInfoActivityIntent =
                         Intent(this@SearchActivity, TrackInfoActivity::class.java)
                     trackInfoActivityIntent.putExtra("track", track)
-                    viewModel.addToHistory(track = track)
+                    vm.addToHistory(track = track)
                     startActivity(trackInfoActivityIntent)
                 }
             }
@@ -187,7 +190,7 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                viewModel.searchDebounce(changedText = p0?.toString() ?: "")
+                vm.searchDebounce(changedText = p0?.toString() ?: "")
                 searchText = p0?.toString() ?: ""
                 if (p0.isNullOrEmpty()) {
                     buttonSearchDelete.isVisible = false
@@ -228,12 +231,12 @@ class SearchActivity : AppCompatActivity() {
         }
         editText.addTextChangedListener(simpleTextWatcher)
 
-        viewModel.observeState().observe(this) {
+        vm.observeState().observe(this) {
             render(it)
         }
 
         placeholderResetButton.setOnClickListener {
-            viewModel.searchDebounce(changedText = searchText)
+            vm.searchDebounce(changedText = searchText)
             hidePlaceholder()
         }
 
@@ -294,7 +297,7 @@ class SearchActivity : AppCompatActivity() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun notifyHistoryAdapter() {
-        val tracksListHistory = viewModel.getTracksHistory()
+        val tracksListHistory = vm.getTracksHistory()
         adapterHistory =
             AdapterHistoryTracks(tracksListHistory, object : SongSearchAdapter.Listener {
                 override fun onClick(track: Track) {

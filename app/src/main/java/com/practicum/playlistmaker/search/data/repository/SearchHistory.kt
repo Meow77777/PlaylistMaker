@@ -22,7 +22,7 @@ class SearchHistory(private val sharedPreferences: SharedPreferences) {
             .apply()
     }
 
-    fun getTracksList() : MutableList<Track> {
+    fun getTracksList(): MutableList<Track> {
         val valueFromSharedPreferences = sharedPreferences.getString(SearchActivity.HISTORY_KEY, "")
         historyList = if (valueFromSharedPreferences.isNullOrEmpty()) mutableListOf()
         else Gson().fromJson(

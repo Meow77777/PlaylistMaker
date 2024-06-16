@@ -1,25 +1,21 @@
 package com.practicum.playlistmaker.player.ui
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.player.models.State
 import com.practicum.playlistmaker.player.models.TrackDetailsInfo
 import com.practicum.playlistmaker.player.presentation.TrackDetailsMapper
 import com.practicum.playlistmaker.player.presentation.TrackInfoViewModel
 import com.practicum.playlistmaker.search.models.Track
 import com.practicum.playlistmaker.utils.DateTimeUtil
-import java.text.SimpleDateFormat
-import java.util.Locale
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 
 class TrackInfoActivity : AppCompatActivity() {
@@ -39,7 +35,12 @@ class TrackInfoActivity : AppCompatActivity() {
     private lateinit var country: TextView
     private lateinit var timerTextView: TextView
 
-    private lateinit var viewModel: TrackInfoViewModel
+    private lateinit var trackUrl : String
+
+    private val vm by viewModel<TrackInfoViewModel>{
+        parametersOf(trackUrl)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.track_info)
@@ -58,17 +59,13 @@ class TrackInfoActivity : AppCompatActivity() {
 
 
         val trackIntent: Track = intent.getParcelableExtra("track")!!
-
-        viewModel = ViewModelProvider(
-            this,
-            TrackInfoViewModel.factory(trackIntent.previewUrl!!)
-        )[TrackInfoViewModel::class.java]
+        trackUrl = trackIntent.previewUrl.toString()
 
 
         val trackInfoDetails = TrackDetailsMapper.map(trackIntent)
         showTrackDetails(trackInfoDetails)
 
-        viewModel.getPlayerState().observe(this) { state ->
+        vm.getPlayerState().observe(this) { state ->
             when (state) {
                 State.Play -> pausePlayer()
                 State.Pause -> startPlayer()
@@ -77,13 +74,13 @@ class TrackInfoActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.getTimerLiveData().observe(this){time ->
+        vm.getTimerLiveData().observe(this) { time ->
             timerTextView.text = time
         }
 
 
         play.setOnClickListener {
-            viewModel.changeState()
+            vm.changeState()
         }
 
         backButton.setOnClickListener {
@@ -112,7 +109,7 @@ class TrackInfoActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        viewModel.releasePlayer()
+        vm.releasePlayer()
     }
 
     private fun startPlayer() {

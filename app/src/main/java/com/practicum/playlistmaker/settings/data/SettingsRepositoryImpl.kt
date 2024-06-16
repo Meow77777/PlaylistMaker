@@ -8,9 +8,11 @@ import com.practicum.playlistmaker.settings.ui.SWITCH_STATUS
 import com.practicum.playlistmaker.utils.App
 
 class SettingsRepositoryImpl(private val application: Application) : SettingsRepository {
+
     private val sharedPreferences = application.getSharedPreferences(MY_PREFS, MODE_PRIVATE)
+
     override fun getDarkThemeStatus(): Boolean {
-        return sharedPreferences.getBoolean(SWITCH_STATUS, false)
+        return sharedPreferences.getBoolean(SWITCH_STATUS,true)
     }
 
     override fun changeDarkThemeStatus(status: Boolean) {

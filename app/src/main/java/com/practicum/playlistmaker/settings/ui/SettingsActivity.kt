@@ -11,23 +11,24 @@ import androidx.appcompat.app.AppCompatActivity
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.settings.presentation.SettingsViewModel
 import com.practicum.playlistmaker.sharing.model.DataEmail
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 const val MY_PREFS: String = "switch_prefs"
 const val SWITCH_STATUS: String = "switch_status"
 
 class SettingsActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: SettingsViewModel
+
     private lateinit var urlShareLink: String
     private lateinit var urlTermsLink: String
     private lateinit var emailDataForm: DataEmail
+
+    private val vm by viewModel<SettingsViewModel>()
 
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
-
-        viewModel = SettingsViewModel()
 
         val buttonSettingsBack = findViewById<ImageView>(R.id.settingsBack)
         val buttonUserAgreement = findViewById<FrameLayout>(R.id.userAgreement)
@@ -35,15 +36,15 @@ class SettingsActivity : AppCompatActivity() {
         val supportButton = findViewById<FrameLayout>(R.id.support)
         val switchThemeButton = findViewById<Switch>(R.id.switchTheme)
 
-        viewModel.getSettingsDarkThemeLiveData().observe(this) { themeStatus ->
+        vm.getSettingsDarkThemeLiveData().observe(this) { themeStatus ->
             switchThemeButton.isChecked = themeStatus
         }
 
         switchThemeButton.setOnCheckedChangeListener { _, checked ->
             if (checked) {
-                viewModel.changeDarkTheme(true)
+                vm.changeDarkTheme(true)
             } else {
-                viewModel.changeDarkTheme(false)
+                vm.changeDarkTheme(false)
             }
         }
 
@@ -51,15 +52,15 @@ class SettingsActivity : AppCompatActivity() {
             finish()
         }
 
-        viewModel.getShareLinkLiveData().observe(this) { link ->
+        vm.getShareLinkLiveData().observe(this) { link ->
             urlShareLink = link
         }
 
-        viewModel.getTermsLinkLiveData().observe(this) { link ->
+        vm.getTermsLinkLiveData().observe(this) { link ->
             urlTermsLink = link
         }
 
-        viewModel.getSupportEmailLiveData().observe(this) { emailForm ->
+        vm.getSupportEmailLiveData().observe(this) { emailForm ->
             emailDataForm = emailForm
         }
 

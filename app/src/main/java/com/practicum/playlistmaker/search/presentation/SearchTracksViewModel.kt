@@ -4,33 +4,22 @@ import android.app.Application
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.lifecycle.ViewModel
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.search.domain.entity.api.TracksInteractor
 import com.practicum.playlistmaker.search.models.Track
 import com.practicum.playlistmaker.search.presentation.state.TracksState
 
-class SearchTracksViewModel(application: Application) : AndroidViewModel(application) {
+class SearchTracksViewModel(
+    private val interactor: TracksInteractor,
+    application: Application
+) :
+    ViewModel() {
 
-    private val tracksInteractor = Creator.provideTracksInteractor(context = application)
-
-    companion object {
-        private const val SEARCH_DEBOUNCE_DELAY = 1000L
-        private val SEARCH_REQUEST_TOKEN = Any()
-
-        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                SearchTracksViewModel(this[APPLICATION_KEY] as Application)
-            }
-        }
-    }
+    private val SEARCH_DEBOUNCE_DELAY = 1000L
+    private val SEARCH_REQUEST_TOKEN = Any()
 
 
     private var latestSearchText: String? = null
@@ -67,19 +56,19 @@ class SearchTracksViewModel(application: Application) : AndroidViewModel(applica
     val noConnectionText = application.resources.getString(R.string.internetProblem)
 
     fun addToHistory(track: Track) {
-        tracksInteractor.addTrackInHistory(track = track)
+        interactor.addTrackInHistory(track = track)
     }
 
 
     fun getTracksHistory(): MutableList<Track> {
-        return tracksInteractor.getTracksList()
+        return interactor.getTracksList()
     }
 
     private fun loadData(expression: String) {
         if (expression.isNotEmpty()) {
             renderState(TracksState.Loading)
 
-            tracksInteractor.searchTracks(
+            interactor.searchTracks(
                 expression = expression,
                 object : TracksInteractor.TracksConsumer {
                     override fun consume(foundTracks: List<Track>?, errorMessage: String?) {
