@@ -6,6 +6,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.bumptech.glide.Glide.init
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.player.models.State
@@ -65,18 +66,20 @@ class TrackInfoActivity : AppCompatActivity() {
         val trackInfoDetails = TrackDetailsMapper.map(trackIntent)
         showTrackDetails(trackInfoDetails)
 
+        vm.loadPlayer(trackUrl)
+
         vm.getPlayerState().observe(this) { state ->
             when (state) {
-                State.Play -> pausePlayer()
-                State.Pause -> startPlayer()
-                State.Prepared -> startPlayer()
-                State.Default -> {}
+                State.isPlaying -> showPauseButton()
+                State.onPause -> showPlayButton()
+                State.Default -> preparePlayer()
+                is State.Timer -> timerTextView.text = state.time
             }
         }
 
-        vm.getTimerLiveData().observe(this) { time ->
-            timerTextView.text = time
-        }
+//        vm.getTimerLiveData().observe(this) { time ->
+//            timerTextView.text = time
+//        }
 
 
         play.setOnClickListener {
@@ -112,11 +115,16 @@ class TrackInfoActivity : AppCompatActivity() {
         vm.releasePlayer()
     }
 
-    private fun startPlayer() {
-        play.setImageResource(R.drawable.pause)
+    private fun preparePlayer(){
+        play.setImageResource(R.drawable.play_song_button_mediateka)
+        timerTextView.text = "00:00"
     }
 
-    private fun pausePlayer() {
+    private fun showPlayButton() {
         play.setImageResource(R.drawable.play_song_button_mediateka)
+    }
+
+    private fun showPauseButton() {
+        play.setImageResource(R.drawable.pause)
     }
 }

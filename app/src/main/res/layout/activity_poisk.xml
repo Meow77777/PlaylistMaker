@@ -55,7 +55,9 @@
             android:drawableStart="@drawable/search2"
             android:hint="@string/search"
             android:imeOptions="actionDone"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:cursorVisible="true"
+            android:textCursorDrawable="@drawable/custom_cursor"/>
 
         <ImageView
             android:id="@+id/deleteSearchButton"
@@ -121,18 +123,17 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="40dp"
                 android:indeterminateTint="@color/blueProgressBar"
-                android:visibility="gone"
-                />
+                android:visibility="gone" />
 
             <ImageView
                 android:id="@+id/noInternetImage"
                 style="@style/NoInternetImage"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
             <ImageView
                 android:id="@+id/nothingFoundImage"
                 style="@style/NothingFoundImage"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/placeholderText"

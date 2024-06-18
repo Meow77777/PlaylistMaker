@@ -1,8 +1,8 @@
 package com.practicum.playlistmaker.player.models
 
 sealed interface State {
-    data object Play: State
-    data object Pause: State
+    data object isPlaying: State
+    data object onPause: State
     data object Default: State
-    data object Prepared : State
+    data class Timer(val time: String): State
 }

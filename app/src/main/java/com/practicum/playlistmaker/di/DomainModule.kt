@@ -24,7 +24,7 @@ val domainModule = module {
         SharingInteractorImpl(sharingRepository = get())
     }
 
-    factory<SettingsInteractor> {
+    factory <SettingsInteractor> {
         SettingsInteractorImpl(settingsRepository = get())
     }
 }

@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker.di
 
 import android.content.Context
+import android.media.MediaPlayer
 import com.google.gson.Gson
 import com.practicum.playlistmaker.player.data.repository.MediaPlayerRepositoryImpl
 import com.practicum.playlistmaker.player.domain.repository.MediaPlayerRepository
@@ -12,6 +13,7 @@ import com.practicum.playlistmaker.search.data.repository.TracksRepositoryImpl
 import com.practicum.playlistmaker.search.domain.entity.repository.TracksRepository
 import com.practicum.playlistmaker.settings.data.SettingsRepositoryImpl
 import com.practicum.playlistmaker.settings.domain.repository.SettingsRepository
+import com.practicum.playlistmaker.settings.ui.MY_PREFS
 import com.practicum.playlistmaker.sharing.data.SharingRepositoryImpl
 import com.practicum.playlistmaker.sharing.domain.repository.SharingRepository
 import org.koin.android.ext.koin.androidContext
@@ -32,6 +34,7 @@ val dataModule = module {
 
     single {
         androidContext().getSharedPreferences("key_for_history_search", Context.MODE_PRIVATE)
+        androidContext().getSharedPreferences(MY_PREFS, Context.MODE_PRIVATE)
     }
 
     factory {
@@ -50,8 +53,12 @@ val dataModule = module {
         TracksRepositoryImpl(networkClient = get(), searchHistory = get())
     }
 
+    factory<MediaPlayer> {
+        MediaPlayer()
+    }
+
     factory<MediaPlayerRepository> {
-        MediaPlayerRepositoryImpl()
+        MediaPlayerRepositoryImpl(mediaPlayer = get())
     }
 
     single<SharingRepository> {
@@ -59,7 +66,7 @@ val dataModule = module {
     }
 
     single<SettingsRepository> {
-        SettingsRepositoryImpl(application = get())
+        SettingsRepositoryImpl(sharedPreferences = get())
     }
 
 }

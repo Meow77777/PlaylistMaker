@@ -33,6 +33,7 @@ class SettingsViewModel(
 
     fun changeDarkTheme(status: Boolean) {
         settingsInteractor.turnOnDarkTheme(status)
+        getDarkThemeStatus()
     }
 
     private fun setShareLink() {

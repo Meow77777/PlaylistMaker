@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.settings.presentation.SettingsViewModel
 import com.practicum.playlistmaker.sharing.model.DataEmail
+import com.practicum.playlistmaker.utils.App
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 const val MY_PREFS: String = "switch_prefs"
@@ -41,11 +42,8 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         switchThemeButton.setOnCheckedChangeListener { _, checked ->
-            if (checked) {
-                vm.changeDarkTheme(true)
-            } else {
-                vm.changeDarkTheme(false)
-            }
+            vm.changeDarkTheme(checked)
+            (application as App).switchTheme(checked)
         }
 
         buttonSettingsBack.setOnClickListener {
