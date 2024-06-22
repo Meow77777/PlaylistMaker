@@ -3,13 +3,14 @@ package com.practicum.playlistmaker.settings.presentation
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.practicum.playlistmaker.creator.Creator
+import com.practicum.playlistmaker.settings.domain.SettingsInteractor
+import com.practicum.playlistmaker.sharing.domain.SharingInteractor
 import com.practicum.playlistmaker.sharing.model.DataEmail
 
-class SettingsViewModel : ViewModel() {
-
-    private val sharingInteractor = Creator.provideSharingInteractor()
-    private val settingsInteractor = Creator.provideSettingsInteractor()
+class SettingsViewModel(
+    private val sharingInteractor: SharingInteractor,
+    private val settingsInteractor: SettingsInteractor
+) : ViewModel() {
 
     private val shareLinkLiveData = MutableLiveData<String>()
     fun getShareLinkLiveData(): LiveData<String> = shareLinkLiveData
@@ -30,8 +31,9 @@ class SettingsViewModel : ViewModel() {
         setDataEmail()
     }
 
-    fun changeDarkTheme(status : Boolean){
+    fun changeDarkTheme(status: Boolean) {
         settingsInteractor.turnOnDarkTheme(status)
+        getDarkThemeStatus()
     }
 
     private fun setShareLink() {

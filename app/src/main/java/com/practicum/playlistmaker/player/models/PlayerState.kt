@@ -1,5 +1,5 @@
 package com.practicum.playlistmaker.player.models
 
 enum class PlayerState {
-    PLAYING, PAUSED, PREPARED, DEFAULT
+    STATE_PLAYING, STATE_PAUSED, STATE_PREPARED, STATE_DEFAULT, STATE_COMPLETED
 }

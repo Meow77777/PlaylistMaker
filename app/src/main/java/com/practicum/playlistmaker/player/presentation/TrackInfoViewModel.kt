@@ -5,76 +5,112 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.practicum.playlistmaker.creator.Creator
+import com.practicum.playlistmaker.player.domain.api.MediaPlayerInteractor
 import com.practicum.playlistmaker.player.models.PlayerState
 import com.practicum.playlistmaker.player.models.State
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class TrackInfoViewModel(
-    trackUrl: String
+    private val trackUrl: String,
+    private val mediaPlayerInteractor: MediaPlayerInteractor
 ) : ViewModel() {
 
-
-    private val provideMediaPlayerInteractor = Creator.provideMediaPlayerInteractor()
+    private var currentPlayerState = PlayerState.STATE_DEFAULT
     private val dateFormat by lazy { SimpleDateFormat("mm:ss", Locale.getDefault()) }
 
     private val statePlayerLiveData = MutableLiveData<State>()
     fun getPlayerState(): LiveData<State> = statePlayerLiveData
 
-    private val timerLiveData = MutableLiveData<String>()
-    fun getTimerLiveData() : LiveData<String> = timerLiveData
+//    private val timerLiveData = MutableLiveData<String>()
+//    fun getTimerLiveData(): LiveData<String> = timerLiveData
 
     private val handler = Handler(Looper.getMainLooper())
 
-    private fun updateTimer(){
-        handler.postDelayed(object : Runnable{
-            override fun run() {
-                try {
-                    timerLiveData.postValue(dateFormat.format(provideMediaPlayerInteractor.getCurrentPosition()))
-                    handler.postDelayed(this,100L)
-                }catch (e: IllegalStateException) {
-                    e.printStackTrace()
-                }
+    private val timer = object : Runnable {
+        override fun run() {
+            try {
+                val time = dateFormat.format(
+                    mediaPlayerInteractor.getCurrentPosition())
+                statePlayerLiveData.postValue(State.Timer(time))
+                handler.postDelayed(this, 300L)
+            } catch (e: IllegalStateException) {
+                e.printStackTrace()
             }
-        }, 1000L)
+        }
+    }
+    private fun startTimerUpdate() {
+        handler.postDelayed(timer, 300L)
     }
 
-    init {
+//    init {
+//        mediaPlayerInteractor.preparePlayer(url = trackUrl)
+//        renderState(state = State.Prepared)
+//    }
+
+    fun loadPlayer(jsonTrack: String) {
+        val track = trackUrl
+
+
+        val playerRun = Runnable {
+            mediaPlayerInteractor.preparePlayer(track)
+        }
+        handler.post(playerRun)
+    }
+
+    fun changeState() {
         playbackControl()
-        provideMediaPlayerInteractor.preparePlayer(url = trackUrl)
     }
 
-    fun changeState(){
-        playbackControl()
+    fun releasePlayer() {
+        mediaPlayerInteractor.releasePlayer()
+        handler.removeCallbacks(timer)
+        handler.removeCallbacks(runnablePlayerState)
     }
 
-    fun releasePlayer(){
-        provideMediaPlayerInteractor.releasePlayer()
+    private val runnablePlayerState = object : Runnable {
+        override fun run() {
+            currentPlayerState = mediaPlayerInteractor.getState()
+            if (currentPlayerState == PlayerState.STATE_COMPLETED) {
+                playbackControl()
+            }
+            handler.postDelayed(this, 500L)
+        }
+    }
+    private fun getAutoCurrentState() {
+        handler.postDelayed(runnablePlayerState, 500L)
+    }
+
+    private fun play(){
+        mediaPlayerInteractor.play()
+        getAutoCurrentState()
+        startTimerUpdate()
+        renderState(state = State.isPlaying)
     }
 
     private fun playbackControl() {
-        when (provideMediaPlayerInteractor.getState()) {
-            PlayerState.PLAYING -> {
-                updateTimer()
-                provideMediaPlayerInteractor.pause()
-                renderState(state = State.Play)
+        when (mediaPlayerInteractor.getState()) {
+
+            PlayerState.STATE_PLAYING -> {
+                mediaPlayerInteractor.pause()
+                renderState(state = State.onPause)
             }
-            PlayerState.PAUSED -> {
-                provideMediaPlayerInteractor.play()
-                renderState(state = State.Pause)
+
+            PlayerState.STATE_PAUSED -> {
+                play()
             }
-            PlayerState.PREPARED -> {
-                updateTimer()
-                provideMediaPlayerInteractor.play()
-                renderState(state = State.Prepared)
+
+            PlayerState.STATE_PREPARED -> {
+                play()
             }
-            PlayerState.DEFAULT -> {
+
+            PlayerState.STATE_COMPLETED -> {
                 renderState(state = State.Default)
+                handler.removeCallbacks(timer)
+                handler.removeCallbacks(runnablePlayerState)
+                mediaPlayerInteractor.setState(state = PlayerState.STATE_PREPARED)
             }
+            else -> null
         }
     }
 
@@ -82,18 +118,9 @@ class TrackInfoViewModel(
         statePlayerLiveData.postValue(state)
     }
 
-    companion object{
-        fun factory(trackUrl: String): ViewModelProvider.Factory {
-            return viewModelFactory {
-                initializer {
-                    TrackInfoViewModel(trackUrl)
-                }
-            }
-        }
-    }
-
     override fun onCleared() {
         super.onCleared()
-        handler.removeCallbacksAndMessages(null)
+        handler.removeCallbacks(timer)
+        handler.removeCallbacks(runnablePlayerState)
     }
 }

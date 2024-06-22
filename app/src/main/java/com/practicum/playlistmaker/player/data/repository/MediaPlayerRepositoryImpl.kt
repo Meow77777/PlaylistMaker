@@ -4,21 +4,18 @@ import android.media.MediaPlayer
 import com.practicum.playlistmaker.player.domain.repository.MediaPlayerRepository
 import com.practicum.playlistmaker.player.models.PlayerState
 
-class MediaPlayerRepositoryImpl : MediaPlayerRepository {
+class MediaPlayerRepositoryImpl(private val mediaPlayer: MediaPlayer) : MediaPlayerRepository {
 
-    private val mediaPlayer = MediaPlayer()
-
-
-    override var state: PlayerState = PlayerState.DEFAULT
+    override var state: PlayerState = PlayerState.STATE_DEFAULT
 
     override fun playPlayer() {
         mediaPlayer.start()
-        state = PlayerState.PLAYING
+        state = PlayerState.STATE_PLAYING
     }
 
     override fun pausePlayer() {
         mediaPlayer.pause()
-        state = PlayerState.PAUSED
+        state = PlayerState.STATE_PAUSED
     }
 
     override fun preparePlayer(url: String) {
@@ -26,10 +23,10 @@ class MediaPlayerRepositoryImpl : MediaPlayerRepository {
             mediaPlayer.setDataSource(url)
             mediaPlayer.prepareAsync()
             mediaPlayer.setOnPreparedListener {
-                state = PlayerState.PREPARED
+                state = PlayerState.STATE_PREPARED
             }
             mediaPlayer.setOnCompletionListener {
-                state = PlayerState.PREPARED
+                state = PlayerState.STATE_COMPLETED
             }
         }
     }
@@ -41,6 +38,5 @@ class MediaPlayerRepositoryImpl : MediaPlayerRepository {
     override fun getCurrentPosition(): Int {
         return mediaPlayer.currentPosition
     }
-
 
 }
