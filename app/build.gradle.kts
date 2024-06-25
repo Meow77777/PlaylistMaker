@@ -30,12 +30,21 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    buildFeatures{
+        viewBinding = true
+    }
+
 }
 
 dependencies {
+    val fragment_version = "1.8.0"
+
+    implementation("androidx.fragment:fragment-ktx:$fragment_version")
     implementation ("androidx.work:work-runtime-ktx:2.9.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.core:core-ktx:1.13.1")

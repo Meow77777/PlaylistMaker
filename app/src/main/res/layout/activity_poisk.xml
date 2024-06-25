@@ -52,12 +52,12 @@
             android:layout_width="match_parent"
             android:layout_height="36dp"
             android:background="@drawable/rounded_edittext"
+            android:cursorVisible="true"
             android:drawableStart="@drawable/search2"
             android:hint="@string/search"
             android:imeOptions="actionDone"
             android:singleLine="true"
-            android:cursorVisible="true"
-            android:textCursorDrawable="@drawable/custom_cursor"/>
+            android:textCursorDrawable="@drawable/custom_cursor" />
 
         <ImageView
             android:id="@+id/deleteSearchButton"
