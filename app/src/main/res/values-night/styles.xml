@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <style name="tabLayoutStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="tabTextColor">@color/white</item>
+        <item name="tabIndicatorColor">@color/white</item>
+        <item name="tabBackground">@color/black_main</item>
+    </style>
+
     <style name="MainBackgroundColorStyle">
         <item name="android:background">@color/black_main</item>
     </style>
@@ -146,6 +154,7 @@
         <item name="android:layout_gravity">center_horizontal</item>
         <item name="android:layout_marginTop">@dimen/size334</item>
         <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0</item>
     </style>
 
     <style name="YouSearchedText">

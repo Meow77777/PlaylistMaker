@@ -27,4 +27,9 @@
     <string name="songGenre">Жанр</string>
     <string name="songCountry">Страна</string>
     <string name="songZero">00:00</string>
+    <string name="likedTracks">Избранные треки</string>
+    <string name="playlists">Плейлисты</string>
+    <string name="mediatekaIsEmpty">Ваша медиатека пуста</string>
+    <string name="noPlaylists">Вы не создали\nни одного плейлиста</string>
+    <string name="addNewPlaylist">Новый плейлист</string>
 </resources>

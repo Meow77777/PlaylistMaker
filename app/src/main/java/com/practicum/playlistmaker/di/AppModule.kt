@@ -1,5 +1,7 @@
 package com.practicum.playlistmaker.di
 
+import com.practicum.playlistmaker.mediateka.presentation.FragmentLikedTracksViewModel
+import com.practicum.playlistmaker.mediateka.presentation.FragmentPlaylistsViewModel
 import com.practicum.playlistmaker.player.presentation.TrackInfoViewModel
 import com.practicum.playlistmaker.search.presentation.SearchTracksViewModel
 import com.practicum.playlistmaker.settings.presentation.SettingsViewModel
@@ -18,6 +20,14 @@ val appModule = module {
 
     viewModel<SearchTracksViewModel> {
         SearchTracksViewModel(interactor = get(), application = get())
+    }
+
+    viewModel<FragmentLikedTracksViewModel> {
+        FragmentLikedTracksViewModel()
+    }
+
+    viewModel<FragmentPlaylistsViewModel> {
+        FragmentPlaylistsViewModel()
     }
 
 }
