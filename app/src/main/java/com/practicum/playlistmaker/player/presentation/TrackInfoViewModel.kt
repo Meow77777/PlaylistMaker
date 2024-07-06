@@ -31,7 +31,8 @@ class TrackInfoViewModel(
         override fun run() {
             try {
                 val time = dateFormat.format(
-                    mediaPlayerInteractor.getCurrentPosition())
+                    mediaPlayerInteractor.getCurrentPosition()
+                )
                 statePlayerLiveData.postValue(State.Timer(time))
                 handler.postDelayed(this, 300L)
             } catch (e: IllegalStateException) {
@@ -39,14 +40,10 @@ class TrackInfoViewModel(
             }
         }
     }
+
     private fun startTimerUpdate() {
         handler.postDelayed(timer, 300L)
     }
-
-//    init {
-//        mediaPlayerInteractor.preparePlayer(url = trackUrl)
-//        renderState(state = State.Prepared)
-//    }
 
     fun loadPlayer(jsonTrack: String) {
         val track = trackUrl
@@ -77,11 +74,12 @@ class TrackInfoViewModel(
             handler.postDelayed(this, 500L)
         }
     }
+
     private fun getAutoCurrentState() {
         handler.postDelayed(runnablePlayerState, 500L)
     }
 
-    private fun play(){
+    private fun play() {
         mediaPlayerInteractor.play()
         getAutoCurrentState()
         startTimerUpdate()
@@ -110,6 +108,7 @@ class TrackInfoViewModel(
                 handler.removeCallbacks(runnablePlayerState)
                 mediaPlayerInteractor.setState(state = PlayerState.STATE_PREPARED)
             }
+
             else -> null
         }
     }

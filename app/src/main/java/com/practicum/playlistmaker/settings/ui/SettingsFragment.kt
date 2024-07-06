@@ -1,14 +1,14 @@
 package com.practicum.playlistmaker.settings.ui
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.Switch
-import androidx.appcompat.app.AppCompatActivity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.databinding.FragmentSettingsBinding
 import com.practicum.playlistmaker.settings.presentation.SettingsViewModel
 import com.practicum.playlistmaker.sharing.model.DataEmail
 import com.practicum.playlistmaker.utils.App
@@ -17,7 +17,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 const val MY_PREFS: String = "switch_prefs"
 const val SWITCH_STATUS: String = "switch_status"
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsFragment : Fragment() {
 
 
     private lateinit var urlShareLink: String
@@ -26,16 +26,23 @@ class SettingsActivity : AppCompatActivity() {
 
     private val vm by viewModel<SettingsViewModel>()
 
-    @SuppressLint("UseSwitchCompatOrMaterialCode")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
+    private lateinit var binding: FragmentSettingsBinding
 
-        val buttonSettingsBack = findViewById<ImageView>(R.id.settingsBack)
-        val buttonUserAgreement = findViewById<FrameLayout>(R.id.userAgreement)
-        val buttonShare = findViewById<FrameLayout>(R.id.shareApp)
-        val supportButton = findViewById<FrameLayout>(R.id.support)
-        val switchThemeButton = findViewById<Switch>(R.id.switchTheme)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentSettingsBinding.inflate(layoutInflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val buttonUserAgreement = binding.userAgreement
+        val buttonShare = binding.shareApp
+        val supportButton = binding.support
+        val switchThemeButton = binding.switchTheme
 
         vm.getSettingsDarkThemeLiveData().observe(this) { themeStatus ->
             switchThemeButton.isChecked = themeStatus
@@ -43,22 +50,18 @@ class SettingsActivity : AppCompatActivity() {
 
         switchThemeButton.setOnCheckedChangeListener { _, checked ->
             vm.changeDarkTheme(checked)
-            (application as App).switchTheme(checked)
+            (activity?.application as App).switchTheme(checked)
         }
 
-        buttonSettingsBack.setOnClickListener {
-            finish()
-        }
-
-        vm.getShareLinkLiveData().observe(this) { link ->
+        vm.getShareLinkLiveData().observe(viewLifecycleOwner) { link ->
             urlShareLink = link
         }
 
-        vm.getTermsLinkLiveData().observe(this) { link ->
+        vm.getTermsLinkLiveData().observe(viewLifecycleOwner) { link ->
             urlTermsLink = link
         }
 
-        vm.getSupportEmailLiveData().observe(this) { emailForm ->
+        vm.getSupportEmailLiveData().observe(viewLifecycleOwner) { emailForm ->
             emailDataForm = emailForm
         }
 

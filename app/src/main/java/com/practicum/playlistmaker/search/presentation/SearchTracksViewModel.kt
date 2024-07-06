@@ -24,17 +24,15 @@ class SearchTracksViewModel(
 
     private var latestSearchText: String? = null
     private val handler = Handler(Looper.getMainLooper())
-
     fun searchDebounce(changedText: String) {
         if (latestSearchText == changedText) {
             return
         }
-
         this.latestSearchText = changedText
         handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
 
         val searchRunnable = Runnable { loadData(changedText) }
-
+        println("start search")
         val postTime = SystemClock.uptimeMillis() + SEARCH_DEBOUNCE_DELAY
         handler.postAtTime(
             searchRunnable,
@@ -43,7 +41,7 @@ class SearchTracksViewModel(
         )
     }
 
-
+    val tracks = mutableListOf<Track>()
     private var listOfHistoryTracks = getTracksHistory()
 
     private val stateTracksLiveData = MutableLiveData<TracksState>()
@@ -66,16 +64,18 @@ class SearchTracksViewModel(
 
     private fun loadData(expression: String) {
         if (expression.isNotEmpty()) {
-            renderState(TracksState.Loading)
 
+            renderState(TracksState.Loading)
+            println(expression)
             interactor.searchTracks(
                 expression = expression,
                 object : TracksInteractor.TracksConsumer {
                     override fun consume(foundTracks: List<Track>?, errorMessage: String?) {
-                        val tracks = mutableListOf<Track>()
 
                         if (foundTracks != null) {
+                            tracks.clear()
                             tracks.addAll(foundTracks)
+                            println("added")
                         }
 
                         when {
@@ -102,4 +102,13 @@ class SearchTracksViewModel(
         stateTracksLiveData.postValue(state)
     }
 
+    fun clearLiveDataTrackState() {
+        tracks.clear()
+        renderState(TracksState.Content(data = tracks))
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
+    }
 }
