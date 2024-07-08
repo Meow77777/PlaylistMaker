@@ -32,7 +32,6 @@ class SearchTracksViewModel(
         handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
 
         val searchRunnable = Runnable { loadData(changedText) }
-        println("start search")
         val postTime = SystemClock.uptimeMillis() + SEARCH_DEBOUNCE_DELAY
         handler.postAtTime(
             searchRunnable,
@@ -55,6 +54,7 @@ class SearchTracksViewModel(
 
     fun addToHistory(track: Track) {
         interactor.addTrackInHistory(track = track)
+        historyTracksLiveData.postValue(getTracksHistory())
     }
 
 
@@ -62,11 +62,15 @@ class SearchTracksViewModel(
         return interactor.getTracksList()
     }
 
+    fun clearTracksHistory() {
+        interactor.clearTracksHistory()
+        historyTracksLiveData.postValue(getTracksHistory())
+    }
+
     private fun loadData(expression: String) {
         if (expression.isNotEmpty()) {
 
             renderState(TracksState.Loading)
-            println(expression)
             interactor.searchTracks(
                 expression = expression,
                 object : TracksInteractor.TracksConsumer {
@@ -75,7 +79,6 @@ class SearchTracksViewModel(
                         if (foundTracks != null) {
                             tracks.clear()
                             tracks.addAll(foundTracks)
-                            println("added")
                         }
 
                         when {

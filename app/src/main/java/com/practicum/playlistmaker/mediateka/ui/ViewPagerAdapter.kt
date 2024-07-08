@@ -5,11 +5,11 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 
 class ViewPagerAdapter(
-    fragmentActivity: Fragment,
+    fragment: Fragment,
     context: Context,
     private val listOfFragments: List<Fragment>
 ) :
-    FragmentStateAdapter(fragmentActivity) {
+    FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int {
         return listOfFragments.size
     }

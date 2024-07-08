@@ -2,9 +2,7 @@ package com.practicum.playlistmaker.search.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Context.MODE_PRIVATE
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -23,7 +21,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
 import com.practicum.playlistmaker.databinding.FragmentSearchBinding
 import com.practicum.playlistmaker.player.ui.TrackInfoActivity
 import com.practicum.playlistmaker.search.models.Track
@@ -37,16 +34,12 @@ class SearchFragment : Fragment() {
     companion object {
         private const val EDIT_TEXT = "TEXT"
         private const val EDIT_TEXT_ENTER = ""
-        const val HISTORY_KEY = "key_for_history_search"
-        const val PREFS_HISTORY = "prefs_history"
-        private var prevTracks: List<Track> = mutableListOf()
     }
 
     lateinit var editText: EditText
 
     private val tracks = ArrayList<Track>()
     private lateinit var simpleTextWatcher: TextWatcher
-    private lateinit var sharedPreferences: SharedPreferences
     lateinit var adapter: SongSearchAdapter
     lateinit var placeholderText: TextView
     lateinit var placeholderImageNoInternet: ImageView
@@ -103,10 +96,6 @@ class SearchFragment : Fragment() {
         recyclerSearchHistory.isVisible = false
         recycler.isVisible = false
 
-        sharedPreferences = this.requireActivity().getSharedPreferences(PREFS_HISTORY, MODE_PRIVATE)
-        val sharedPreferences: SharedPreferences =
-            this.requireActivity().getSharedPreferences(HISTORY_KEY, MODE_PRIVATE)
-
         tracksListHistory = mutableListOf()
 
         vm.getHistoryTracksLiveData().observe(viewLifecycleOwner) { listOfHistoryTracks ->
@@ -118,7 +107,6 @@ class SearchFragment : Fragment() {
             AdapterHistoryTracks(tracksListHistory, object : SongSearchAdapter.Listener {
                 override fun onClick(track: Track) {
                     if (clickDebounce()) {
-
                         val trackInfoActivityIntent =
                             Intent(requireContext(), TrackInfoActivity::class.java)
                         trackInfoActivityIntent.putExtra("track", track)
@@ -130,7 +118,7 @@ class SearchFragment : Fragment() {
 
 
         //ADAPTER
-        adapter = SongSearchAdapter(tracks, sharedPreferences, object : SongSearchAdapter.Listener {
+        adapter = SongSearchAdapter(tracks, object : SongSearchAdapter.Listener {
             override fun onClick(track: Track) {
                 if (clickDebounce()) {
                     val trackInfoActivityIntent =
@@ -143,8 +131,6 @@ class SearchFragment : Fragment() {
         })
         recycler.adapter = adapter
 
-
-
         recyclerSearchHistory.adapter = adapterHistory
         recyclerSearchHistory.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
@@ -153,7 +139,6 @@ class SearchFragment : Fragment() {
             youSearchedText.visibility =
                 if (hasFocus && editText.text.isEmpty() && tracksListHistory.isNotEmpty()) View.VISIBLE else View.GONE
             if (hasFocus && editText.text.isEmpty() && tracksListHistory.isNotEmpty()) {
-                notifyHistoryAdapter()
                 recyclerSearchHistory.visibility = View.VISIBLE
             } else {
                 View.GONE
@@ -161,11 +146,11 @@ class SearchFragment : Fragment() {
             deleteSearchHistory.visibility =
                 if (hasFocus && editText.text.isEmpty() && tracksListHistory.isNotEmpty()) View.VISIBLE else View.GONE
         }
+
+        //УДАЛЕНИЕ ИСТОРИИ ТРЕКОВ
         deleteSearchHistory.setOnClickListener {
-            tracksListHistory.clear()
-            sharedPreferences.edit().putString(HISTORY_KEY, Gson().toJson(tracksListHistory))
-                .apply()
-            adapterHistory.notifyDataSetChanged()
+            vm.clearTracksHistory()
+            notifyHistoryAdapter()
             youSearchedText.isVisible = false
             deleteSearchHistory.isVisible = false
             recyclerSearchHistory.isVisible = false
@@ -179,7 +164,7 @@ class SearchFragment : Fragment() {
             editText.setText(savedInstanceState.getString(EDIT_TEXT, enterEditText))
         }
 
-
+        //УДАЛЕНИЕ ПОИСКОВОГО ЗАПРОСА
         buttonSearchDelete.setOnClickListener {
             recycler.visibility = View.GONE
             progressBar.visibility = View.GONE
@@ -247,10 +232,11 @@ class SearchFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
+
         editText.text.clear()
         vm.clearLiveDataTrackState()
         simpleTextWatcher.let { binding.editText.removeTextChangedListener(it) }
+        super.onDestroyView()
     }
 
 
@@ -338,11 +324,6 @@ class SearchFragment : Fragment() {
         super.onSaveInstanceState(outState)
         outState.putString(EDIT_TEXT, enterEditText)
     }
-
-//    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-//        super.onRestoreInstanceState(savedInstanceState)
-//        enterEditText = savedInstanceState.getString(EDIT_TEXT, enterEditText)
-//    }
 
     private fun hidePlaceholder() {
         placeholderImageNothingFound.isVisible = false

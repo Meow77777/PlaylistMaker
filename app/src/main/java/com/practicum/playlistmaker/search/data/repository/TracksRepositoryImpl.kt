@@ -45,4 +45,8 @@ class TracksRepositoryImpl(
         return searchHistory.getTracksList()
     }
 
+    override fun clearTracksHistory() {
+        searchHistory.clearTracksHistory()
+    }
+
 }
