@@ -6,7 +6,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
-import com.bumptech.glide.Glide.init
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.player.models.State
@@ -36,9 +35,9 @@ class TrackInfoActivity : AppCompatActivity() {
     private lateinit var country: TextView
     private lateinit var timerTextView: TextView
 
-    private lateinit var trackUrl : String
+    private lateinit var trackUrl: String
 
-    private val vm by viewModel<TrackInfoViewModel>{
+    private val vm by viewModel<TrackInfoViewModel> {
         parametersOf(trackUrl)
     }
 
@@ -57,7 +56,6 @@ class TrackInfoActivity : AppCompatActivity() {
         primaryGenreName = findViewById(R.id.songGenreTrackInfo)
         country = findViewById(R.id.songCountryTrackInfo)
         timerTextView = findViewById(R.id.songCurrentTimeTrackInfo)
-
 
         val trackIntent: Track = intent.getParcelableExtra("track")!!
         trackUrl = trackIntent.previewUrl.toString()
@@ -115,7 +113,7 @@ class TrackInfoActivity : AppCompatActivity() {
         vm.releasePlayer()
     }
 
-    private fun preparePlayer(){
+    private fun preparePlayer() {
         play.setImageResource(R.drawable.play_song_button_mediateka)
         timerTextView.text = "00:00"
     }

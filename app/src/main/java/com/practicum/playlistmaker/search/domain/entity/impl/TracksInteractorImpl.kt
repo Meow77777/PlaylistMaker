@@ -31,4 +31,7 @@ class TracksInteractorImpl(private val repository: TracksRepository) : TracksInt
     override fun getTracksList() : MutableList<Track>{
         return repository.getTracksList()
     }
+    override fun clearTracksHistory(){
+        return repository.clearTracksHistory()
+    }
 }

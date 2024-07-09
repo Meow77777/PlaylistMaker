@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <style name="NavigationView">
+        <item name="itemIconTint">@drawable/bottom_nav_icon_selector_night</item>
+        <item name="itemTextColor">@drawable/bottom_nav_icon_selector_night</item>
+        <item name="android:background">@color/black_main</item>
+    </style>
     <style name="tabLayoutStyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>

@@ -1,15 +1,15 @@
 package com.practicum.playlistmaker.mediateka.ui
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 
 class ViewPagerAdapter(
-    activity: FragmentActivity,
+    fragment: Fragment,
+    context: Context,
     private val listOfFragments: List<Fragment>
 ) :
-    FragmentStateAdapter(activity) {
+    FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int {
         return listOfFragments.size
     }
