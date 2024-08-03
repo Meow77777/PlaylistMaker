@@ -5,9 +5,16 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.player.domain.api.MediaPlayerInteractor
 import com.practicum.playlistmaker.player.models.PlayerState
 import com.practicum.playlistmaker.player.models.State
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -22,33 +29,30 @@ class TrackInfoViewModel(
     private val statePlayerLiveData = MutableLiveData<State>()
     fun getPlayerState(): LiveData<State> = statePlayerLiveData
 
-//    private val timerLiveData = MutableLiveData<String>()
-//    fun getTimerLiveData(): LiveData<String> = timerLiveData
 
     private val handler = Handler(Looper.getMainLooper())
+    private var jobTimer: Job? = null
+    private var jobState: Job? = null
 
-    private val timer = object : Runnable {
-        override fun run() {
-            try {
+
+    private fun startTimerUpdate() {
+        jobTimer = viewModelScope.launch {
+            while (isActive) {
+                delay(300L)
                 val time = dateFormat.format(
                     mediaPlayerInteractor.getCurrentPosition()
                 )
-                statePlayerLiveData.postValue(State.Timer(time))
-                handler.postDelayed(this, 300L)
-            } catch (e: IllegalStateException) {
-                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    statePlayerLiveData.postValue(State.Timer(time))
+                }
+
             }
         }
-    }
 
-    private fun startTimerUpdate() {
-        handler.postDelayed(timer, 300L)
     }
 
     fun loadPlayer(jsonTrack: String) {
         val track = trackUrl
-
-
         val playerRun = Runnable {
             mediaPlayerInteractor.preparePlayer(track)
         }
@@ -61,23 +65,22 @@ class TrackInfoViewModel(
 
     fun releasePlayer() {
         mediaPlayerInteractor.releasePlayer()
-        handler.removeCallbacks(timer)
-        handler.removeCallbacks(runnablePlayerState)
-    }
-
-    private val runnablePlayerState = object : Runnable {
-        override fun run() {
-            currentPlayerState = mediaPlayerInteractor.getState()
-            if (currentPlayerState == PlayerState.STATE_COMPLETED) {
-                playbackControl()
-            }
-            handler.postDelayed(this, 500L)
-        }
+        jobTimer?.cancel()
+        jobState?.cancel()
     }
 
     private fun getAutoCurrentState() {
-        handler.postDelayed(runnablePlayerState, 500L)
+        viewModelScope.launch {
+            while (isActive) {
+                currentPlayerState = mediaPlayerInteractor.getState()
+                if (currentPlayerState == PlayerState.STATE_COMPLETED) {
+                    playbackControl()
+                }
+                delay(300L)
+            }
+        }
     }
+
 
     private fun play() {
         mediaPlayerInteractor.play()
@@ -104,12 +107,12 @@ class TrackInfoViewModel(
 
             PlayerState.STATE_COMPLETED -> {
                 renderState(state = State.Default)
-                handler.removeCallbacks(timer)
-                handler.removeCallbacks(runnablePlayerState)
+                jobTimer?.cancel()
+                jobState?.cancel()
                 mediaPlayerInteractor.setState(state = PlayerState.STATE_PREPARED)
             }
 
-            else -> null
+            else -> {}
         }
     }
 
@@ -119,7 +122,7 @@ class TrackInfoViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        handler.removeCallbacks(timer)
-        handler.removeCallbacks(runnablePlayerState)
+        jobTimer?.cancel()
+        jobState?.cancel()
     }
 }
