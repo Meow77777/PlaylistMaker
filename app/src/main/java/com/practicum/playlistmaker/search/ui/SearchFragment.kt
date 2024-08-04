@@ -19,6 +19,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.databinding.FragmentSearchBinding
@@ -26,6 +27,8 @@ import com.practicum.playlistmaker.player.ui.TrackInfoActivity
 import com.practicum.playlistmaker.search.models.Track
 import com.practicum.playlistmaker.search.presentation.SearchTracksViewModel
 import com.practicum.playlistmaker.search.presentation.state.TracksState
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -139,6 +142,7 @@ class SearchFragment : Fragment() {
             youSearchedText.visibility =
                 if (hasFocus && editText.text.isEmpty() && tracksListHistory.isNotEmpty()) View.VISIBLE else View.GONE
             if (hasFocus && editText.text.isEmpty() && tracksListHistory.isNotEmpty()) {
+                notifyHistoryAdapter()
                 recyclerSearchHistory.visibility = View.VISIBLE
             } else {
                 View.GONE
@@ -337,7 +341,10 @@ class SearchFragment : Fragment() {
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
-            handler.postDelayed({ isClickAllowed = true }, 1000L)
+            viewLifecycleOwner.lifecycleScope.launch {
+                delay(1000L)
+                isClickAllowed = true
+            }
         }
         return current
     }

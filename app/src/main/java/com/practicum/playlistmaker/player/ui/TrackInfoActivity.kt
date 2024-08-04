@@ -64,7 +64,7 @@ class TrackInfoActivity : AppCompatActivity() {
         val trackInfoDetails = TrackDetailsMapper.map(trackIntent)
         showTrackDetails(trackInfoDetails)
 
-        vm.loadPlayer(trackUrl)
+        vm.loadPlayer()
 
         vm.getPlayerState().observe(this) { state ->
             when (state) {
