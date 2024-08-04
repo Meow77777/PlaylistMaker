@@ -51,7 +51,7 @@ class TrackInfoViewModel(
 
     }
 
-    fun loadPlayer(jsonTrack: String) {
+    fun loadPlayer() {
         val track = trackUrl
         val playerRun = Runnable {
             mediaPlayerInteractor.preparePlayer(track)
@@ -70,7 +70,7 @@ class TrackInfoViewModel(
     }
 
     private fun getAutoCurrentState() {
-        viewModelScope.launch {
+        jobState = viewModelScope.launch {
             while (isActive) {
                 currentPlayerState = mediaPlayerInteractor.getState()
                 if (currentPlayerState == PlayerState.STATE_COMPLETED) {
@@ -94,6 +94,7 @@ class TrackInfoViewModel(
 
             PlayerState.STATE_PLAYING -> {
                 mediaPlayerInteractor.pause()
+                jobTimer?.cancel()
                 renderState(state = State.onPause)
             }
 
