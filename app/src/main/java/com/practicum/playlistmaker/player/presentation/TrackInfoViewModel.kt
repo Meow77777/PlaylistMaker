@@ -23,6 +23,7 @@ class TrackInfoViewModel(
     private val mediaPlayerInteractor: MediaPlayerInteractor
 ) : ViewModel() {
 
+
     private var currentPlayerState = PlayerState.STATE_DEFAULT
     private val dateFormat by lazy { SimpleDateFormat("mm:ss", Locale.getDefault()) }
 
@@ -36,6 +37,7 @@ class TrackInfoViewModel(
 
 
     private fun startTimerUpdate() {
+        jobTimer?.cancel()
         jobTimer = viewModelScope.launch {
             while (isActive) {
                 delay(300L)
@@ -70,11 +72,15 @@ class TrackInfoViewModel(
     }
 
     private fun getAutoCurrentState() {
+        jobState?.cancel()
         jobState = viewModelScope.launch {
             while (isActive) {
                 currentPlayerState = mediaPlayerInteractor.getState()
                 if (currentPlayerState == PlayerState.STATE_COMPLETED) {
-                    playbackControl()
+                    renderState(state = State.Default)
+                    jobTimer?.cancel()
+                    jobState?.cancel()
+                    mediaPlayerInteractor.setState(state = PlayerState.STATE_PREPARED)
                 }
                 delay(300L)
             }
@@ -94,6 +100,7 @@ class TrackInfoViewModel(
 
             PlayerState.STATE_PLAYING -> {
                 mediaPlayerInteractor.pause()
+                jobState?.cancel()
                 jobTimer?.cancel()
                 renderState(state = State.onPause)
             }
@@ -106,12 +113,7 @@ class TrackInfoViewModel(
                 play()
             }
 
-            PlayerState.STATE_COMPLETED -> {
-                renderState(state = State.Default)
-                jobTimer?.cancel()
-                jobState?.cancel()
-                mediaPlayerInteractor.setState(state = PlayerState.STATE_PREPARED)
-            }
+            PlayerState.STATE_COMPLETED -> {}
 
             else -> {}
         }

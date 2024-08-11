@@ -23,6 +23,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.databinding.FragmentSearchBinding
+import com.practicum.playlistmaker.player.presentation.TrackInfoViewModel
 import com.practicum.playlistmaker.player.ui.TrackInfoActivity
 import com.practicum.playlistmaker.search.models.Track
 import com.practicum.playlistmaker.search.presentation.SearchTracksViewModel
@@ -118,6 +119,7 @@ class SearchFragment : Fragment() {
                 }
 
             })
+
 
 
         //ADAPTER
