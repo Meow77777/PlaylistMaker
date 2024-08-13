@@ -1,16 +1,17 @@
 package com.practicum.playlistmaker.search.presentation
 
 import android.app.Application
-import android.os.Handler
-import android.os.Looper
-import android.os.SystemClock
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.search.domain.entity.api.TracksInteractor
 import com.practicum.playlistmaker.search.models.Track
 import com.practicum.playlistmaker.search.presentation.state.TracksState
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SearchTracksViewModel(
     private val interactor: TracksInteractor,
@@ -19,30 +20,32 @@ class SearchTracksViewModel(
     ViewModel() {
 
     private val SEARCH_DEBOUNCE_DELAY = 1000L
-    private val SEARCH_REQUEST_TOKEN = Any()
 
 
     private var latestSearchText: String? = null
-    private val handler = Handler(Looper.getMainLooper())
+
+    private var searchJob: Job? = null
+
     fun searchDebounce(changedText: String) {
         if (latestSearchText == changedText) {
             return
         }
         this.latestSearchText = changedText
-        handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
+        searchJob?.cancel()
 
-        val searchRunnable = Runnable { loadData(changedText) }
-        val postTime = SystemClock.uptimeMillis() + SEARCH_DEBOUNCE_DELAY
-        handler.postAtTime(
-            searchRunnable,
-            SEARCH_REQUEST_TOKEN,
-            postTime,
-        )
+        searchJob = viewModelScope.launch {
+            delay(SEARCH_DEBOUNCE_DELAY)
+            loadData(changedText)
+        }
+
     }
 
     val tracks = mutableListOf<Track>()
     private var listOfHistoryTracks = getTracksHistory()
 
+    init {
+        println(listOfHistoryTracks)
+    }
     private val stateTracksLiveData = MutableLiveData<TracksState>()
     fun observeState(): LiveData<TracksState> = stateTracksLiveData
 
@@ -71,35 +74,37 @@ class SearchTracksViewModel(
         if (expression.isNotEmpty()) {
 
             renderState(TracksState.Loading)
-            interactor.searchTracks(
-                expression = expression,
-                object : TracksInteractor.TracksConsumer {
-                    override fun consume(foundTracks: List<Track>?, errorMessage: String?) {
+            viewModelScope.launch {
+                interactor.searchTracks(
+                    expression = expression
+                ).collect { pair ->
+                    processResult(pair.first, pair.second)
+                }
+            }
 
-                        if (foundTracks != null) {
-                            tracks.clear()
-                            tracks.addAll(foundTracks)
-                        }
-
-                        when {
-                            errorMessage != null -> {
-                                renderState(TracksState.Error(message = noConnectionText))
-                            }
-
-                            tracks.isEmpty() -> {
-                                renderState(TracksState.Empty(message = nothingFoundText))
-                            }
-
-                            else -> {
-                                renderState(TracksState.Content(data = tracks))
-                            }
-                        }
-
-                    }
-                })
         }
     }
 
+    private fun processResult(foundTracks: List<Track>?, errorMessage: String?) {
+        if (foundTracks != null) {
+            tracks.clear()
+            tracks.addAll(foundTracks)
+        }
+
+        when {
+            errorMessage != null -> {
+                renderState(TracksState.Error(message = noConnectionText))
+            }
+
+            tracks.isEmpty() -> {
+                renderState(TracksState.Empty(message = nothingFoundText))
+            }
+
+            else -> {
+                renderState(TracksState.Content(data = tracks))
+            }
+        }
+    }
 
     private fun renderState(state: TracksState) {
         stateTracksLiveData.postValue(state)
@@ -112,6 +117,8 @@ class SearchTracksViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
+        searchJob?.cancel()
     }
+
+
 }
