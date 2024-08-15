@@ -2,7 +2,10 @@ package com.practicum.playlistmaker.di
 
 import android.content.Context
 import android.media.MediaPlayer
+import androidx.room.Room
 import com.google.gson.Gson
+import com.practicum.playlistmaker.player.data.db.AppDatabase
+import com.practicum.playlistmaker.player.data.db.converters.TrackDbConverter
 import com.practicum.playlistmaker.player.data.repository.MediaPlayerRepositoryImpl
 import com.practicum.playlistmaker.player.domain.repository.MediaPlayerRepository
 import com.practicum.playlistmaker.search.data.NetworkClient
@@ -33,6 +36,12 @@ val dataModule = module {
     }
 
     single {
+        Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db")
+            .fallbackToDestructiveMigration()
+            .build()
+    }
+
+    single {
         androidContext().getSharedPreferences("key_for_history_search", Context.MODE_PRIVATE)
         androidContext().getSharedPreferences(MY_PREFS, Context.MODE_PRIVATE)
     }
@@ -57,8 +66,16 @@ val dataModule = module {
         MediaPlayer()
     }
 
+    factory<TrackDbConverter> {
+        TrackDbConverter(appDatabase = get())
+    }
+
     factory<MediaPlayerRepository> {
-        MediaPlayerRepositoryImpl(mediaPlayer = get())
+        MediaPlayerRepositoryImpl(
+            mediaPlayer = get(),
+            appDatabase = get(),
+            trackDbConverter = get()
+        )
     }
 
     single<SharingRepository> {

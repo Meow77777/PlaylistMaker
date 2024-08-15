@@ -8,10 +8,15 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.tabs.TabLayoutMediator
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentMediatekaBinding
+import com.practicum.playlistmaker.mediateka.presentation.FragmentLikedTracksViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MediatekaFragment : Fragment() {
 
     private lateinit var binding: FragmentMediatekaBinding
+
+    private val vm by viewModel<FragmentLikedTracksViewModel>()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -23,6 +28,7 @@ class MediatekaFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
 
         val listOfFragments = initFragments()
         val listOfFragmentsTitles = initTitles()

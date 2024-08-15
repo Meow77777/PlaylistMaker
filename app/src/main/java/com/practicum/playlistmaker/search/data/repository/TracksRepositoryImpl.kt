@@ -30,6 +30,8 @@ class TracksRepositoryImpl(
                             it.primaryGenreName,
                             it.country,
                             it.previewUrl,
+                            it.trackId,
+                            id = null
                         )
                     }
                     emit(Resource.Success(data))

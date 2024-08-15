@@ -13,6 +13,9 @@ data class Track(
     val primaryGenreName: String?,
     val country: String?,
     val previewUrl: String?,
+    val trackId: Long?,
+    var isLiked: Boolean = false,
+    var id: Long?
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString(),
@@ -24,6 +27,9 @@ data class Track(
         parcel.readString(),
         parcel.readString(),
         parcel.readString(),
+        parcel.readLong(),
+        parcel.readBoolean(),
+        parcel.readLong()
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -36,6 +42,7 @@ data class Track(
         parcel.writeString(primaryGenreName)
         parcel.writeString(country)
         parcel.writeString(previewUrl)
+        parcel.writeLong(trackId!!)
     }
 
     override fun describeContents(): Int {

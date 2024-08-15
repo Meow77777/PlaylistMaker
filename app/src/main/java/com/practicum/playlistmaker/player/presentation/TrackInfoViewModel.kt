@@ -9,20 +9,27 @@ import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.player.domain.api.MediaPlayerInteractor
 import com.practicum.playlistmaker.player.models.PlayerState
 import com.practicum.playlistmaker.player.models.State
+import com.practicum.playlistmaker.search.models.Track
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class TrackInfoViewModel(
-    private val trackUrl: String,
+    private val track: Track,
     private val mediaPlayerInteractor: MediaPlayerInteractor
 ) : ViewModel() {
 
+    private var listOfTracksId: List<Long> = listOf()
+    private var job: Job? = null
+
+    private val isLikedLiveData = MutableLiveData<Boolean>()
+    fun getLikedStatusLiveData(): LiveData<Boolean> = isLikedLiveData
 
     private var currentPlayerState = PlayerState.STATE_DEFAULT
     private val dateFormat by lazy { SimpleDateFormat("mm:ss", Locale.getDefault()) }
@@ -30,11 +37,48 @@ class TrackInfoViewModel(
     private val statePlayerLiveData = MutableLiveData<State>()
     fun getPlayerState(): LiveData<State> = statePlayerLiveData
 
+    init {
+        getTracksId()
+        updateLikedStatus()
+        println(listOfTracksId)
+    }
+
+    private fun updateLikedStatus() {
+        if (listOfTracksId.contains(track.trackId)) {
+            isLikedLiveData.postValue(true)
+        } else {
+            isLikedLiveData.postValue(false)
+        }
+    }
+
+    fun addTrackToFavor(track: Track) {
+        viewModelScope.launch {
+            mediaPlayerInteractor.addTrackInFavor(track)
+            isLikedLiveData.postValue(true)
+        }
+    }
+
+    fun deleteTrackFromFavor(track: Track) {
+        viewModelScope.launch {
+            mediaPlayerInteractor.deleteTrackFromFavor(track)
+            isLikedLiveData.postValue(false)
+        }
+    }
+
+    private fun getTracksId(): List<Long> {
+        job?.cancel()
+        runBlocking {
+            job = viewModelScope.launch(Dispatchers.IO) {
+                listOfTracksId = mediaPlayerInteractor.getTracksByTrackId()
+            }
+            job?.join()
+        }
+        return listOfTracksId
+    }
 
     private val handler = Handler(Looper.getMainLooper())
     private var jobTimer: Job? = null
     private var jobState: Job? = null
-
 
     private fun startTimerUpdate() {
         jobTimer?.cancel()
@@ -54,9 +98,8 @@ class TrackInfoViewModel(
     }
 
     fun loadPlayer() {
-        val track = trackUrl
         val playerRun = Runnable {
-            mediaPlayerInteractor.preparePlayer(track)
+            mediaPlayerInteractor.preparePlayer(track.previewUrl!!)
         }
         handler.post(playerRun)
     }
