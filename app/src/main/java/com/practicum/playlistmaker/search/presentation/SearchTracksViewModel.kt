@@ -43,9 +43,6 @@ class SearchTracksViewModel(
     val tracks = mutableListOf<Track>()
     private var listOfHistoryTracks = getTracksHistory()
 
-    init {
-        println(listOfHistoryTracks)
-    }
     private val stateTracksLiveData = MutableLiveData<TracksState>()
     fun observeState(): LiveData<TracksState> = stateTracksLiveData
 

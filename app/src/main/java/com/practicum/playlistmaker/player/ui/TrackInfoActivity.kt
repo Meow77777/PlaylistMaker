@@ -34,11 +34,14 @@ class TrackInfoActivity : AppCompatActivity() {
     private lateinit var primaryGenreName: TextView
     private lateinit var country: TextView
     private lateinit var timerTextView: TextView
+    private lateinit var likeButton: ImageButton
 
-    private lateinit var trackUrl: String
+    private var likedStatus = false
+
+    private lateinit var trackIntent: Track
 
     private val vm by viewModel<TrackInfoViewModel> {
-        parametersOf(trackUrl)
+        parametersOf(trackIntent)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,10 +59,30 @@ class TrackInfoActivity : AppCompatActivity() {
         primaryGenreName = findViewById(R.id.songGenreTrackInfo)
         country = findViewById(R.id.songCountryTrackInfo)
         timerTextView = findViewById(R.id.songCurrentTimeTrackInfo)
+        likeButton = findViewById(R.id.likeSongTrackInfo)
 
-        val trackIntent: Track = intent.getParcelableExtra("track")!!
-        trackUrl = trackIntent.previewUrl.toString()
+        trackIntent = intent.getParcelableExtra("track")!!
 
+        vm.getLikedStatusLiveData().observe(this) { status ->
+            when (status) {
+                true -> {
+                    likeButton.setImageResource(R.drawable.red_like_mediateka)
+                    likedStatus = true
+                }
+
+                false -> {
+                    likeButton.setImageResource(R.drawable.like_mediateka)
+                    likedStatus = false
+                }
+            }
+        }
+
+        likeButton.setOnClickListener {
+            when (likedStatus){
+                true -> vm.deleteTrackFromFavor(trackIntent)
+                false -> vm.addTrackToFavor(trackIntent)
+            }
+        }
 
         val trackInfoDetails = TrackDetailsMapper.map(trackIntent)
         showTrackDetails(trackInfoDetails)

@@ -8,7 +8,7 @@
     tools:context="com.practicum.playlistmaker.mediateka.ui.FragmentLikedTracks">
 
     <ImageView
-        android:id="@+id/mediatekaIsEmpty"
+        android:id="@+id/mediatekaIsEmptyImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/NothingFoundImage"
@@ -19,14 +19,23 @@
         />
 
     <TextView
+        android:id="@+id/mediatekaIsEmptyText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/mediatekaIsEmpty"
-        app:layout_constraintTop_toBottomOf="@id/mediatekaIsEmpty"
+        app:layout_constraintTop_toBottomOf="@id/mediatekaIsEmptyImage"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="@dimen/padding16"
         style="@style/TextSearchProblem"
         />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/liked_tracks_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

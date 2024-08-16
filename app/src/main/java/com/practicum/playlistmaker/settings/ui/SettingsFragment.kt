@@ -44,7 +44,7 @@ class SettingsFragment : Fragment() {
         val supportButton = binding.support
         val switchThemeButton = binding.switchTheme
 
-        vm.getSettingsDarkThemeLiveData().observe(this) { themeStatus ->
+        vm.getSettingsDarkThemeLiveData().observe(viewLifecycleOwner) { themeStatus ->
             switchThemeButton.isChecked = themeStatus
         }
 

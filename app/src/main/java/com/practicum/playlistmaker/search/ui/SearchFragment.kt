@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -23,7 +21,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.databinding.FragmentSearchBinding
-import com.practicum.playlistmaker.player.presentation.TrackInfoViewModel
 import com.practicum.playlistmaker.player.ui.TrackInfoActivity
 import com.practicum.playlistmaker.search.models.Track
 import com.practicum.playlistmaker.search.presentation.SearchTracksViewModel
@@ -57,9 +54,6 @@ class SearchFragment : Fragment() {
     private lateinit var deleteSearchHistory: Button
 
     private lateinit var adapterHistory: AdapterHistoryTracks
-
-
-    private val handler = Handler(Looper.getMainLooper())
 
     private var isClickAllowed = true
 
@@ -115,11 +109,11 @@ class SearchFragment : Fragment() {
                             Intent(requireContext(), TrackInfoActivity::class.java)
                         trackInfoActivityIntent.putExtra("track", track)
                         startActivity(trackInfoActivityIntent)
+
                     }
                 }
 
             })
-
 
 
         //ADAPTER
