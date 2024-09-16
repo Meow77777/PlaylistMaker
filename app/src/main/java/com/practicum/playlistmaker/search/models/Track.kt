@@ -43,6 +43,8 @@ data class Track(
         parcel.writeString(country)
         parcel.writeString(previewUrl)
         parcel.writeLong(trackId!!)
+        parcel.writeBoolean(isLiked)
+        id?.let { parcel.writeLong(it) }
     }
 
     override fun describeContents(): Int {

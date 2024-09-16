@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlaylistsBinding
 
 class FragmentPlaylists : Fragment() {
@@ -22,6 +24,10 @@ class FragmentPlaylists : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.addNewPlaylist.setOnClickListener {
+            findNavController().navigate(R.id.fragmentCreatePlaylist)
+        }
     }
 
     companion object {
