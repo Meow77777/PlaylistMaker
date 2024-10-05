@@ -30,6 +30,7 @@ class FragmentLikedTracks : Fragment() {
     private lateinit var adapter: SongSearchAdapter
 
     private val vm by viewModel<FragmentLikedTracksViewModel>()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

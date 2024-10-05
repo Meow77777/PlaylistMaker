@@ -12,7 +12,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
@@ -20,20 +19,25 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentCreatePlaylistBinding
+import com.practicum.playlistmaker.mediateka.models.Playlist
+import com.practicum.playlistmaker.mediateka.presentation.FragmentCreatePlaylistViewModel
 import com.practicum.playlistmaker.utils.DateTimeUtil
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.io.FileOutputStream
 
 class FragmentCreatePlaylist : Fragment() {
 
     private lateinit var binding: FragmentCreatePlaylistBinding
-
+    private val vm by viewModel<FragmentCreatePlaylistViewModel>()
+    private lateinit var imageUri: Uri
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentCreatePlaylistBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -55,6 +59,7 @@ class FragmentCreatePlaylist : Fragment() {
                         .transform(RoundedCorners(DateTimeUtil.dpToPx(8f, requireContext())))
                         .into(binding.addPlaylistImage)
 
+                    imageUri = uri
                     saveImageToPrivateStorage(uri)
                 } else {
                     Log.d("PhotoPicker", "No media selected")
@@ -77,13 +82,43 @@ class FragmentCreatePlaylist : Fragment() {
         })
 
         binding.createPlaylistButton.setOnClickListener {
+
             if (binding.createPlaylistButton.isEnabled) {
-                Toast.makeText(
-                    requireContext(),
-                    "Плейлист ${binding.editTextNamePlaylist.text.toString()} создан",
-                    Toast.LENGTH_LONG
-                ).show()
-                findNavController().popBackStack()
+                val newPlaylist = Playlist(
+                    name = binding.editTextNamePlaylist.text.toString(),
+                    description = binding.editTextDescriptionPlaylist.text.toString(),
+                    image = imageUri.toString(),
+                    tracks = mutableListOf()
+                )
+                vm.addPlaylist(playlist = newPlaylist)
+
+                val navController = findNavController()
+
+                // Получаем SavedStateHandle у предыдущего фрагмента через NavController
+                navController.previousBackStackEntry?.savedStateHandle?.set(
+                    "playlistName",
+                    binding.editTextNamePlaylist.text.toString()
+                )
+
+                // Возврат на предыдущий фрагмент
+                navController.popBackStack()
+
+//                parentFragmentManager.setFragmentResult("playlistCreated", Bundle().apply {
+//                    putString("playlistName", binding.editTextNamePlaylist.text.toString())
+//                })
+//                Toast.makeText(
+//                    requireContext(),
+//                    "Плейлист ${binding.editTextNamePlaylist.text.toString()} создан",
+//                    Toast.LENGTH_LONG
+//                ).show()
+//                val playlistsFragment =
+//                    parentFragmentManager.findFragmentById(R.id.createdPlaylists) as? FragmentPlaylists
+//                playlistsFragment?.arguments = Bundle().apply {
+//                    putBoolean("showToast", true)
+//                    putString("playlistName", binding.editTextNamePlaylist.text.toString())
+//                }
+//                findNavController().popBackStack()
+
             }
         }
 
@@ -96,10 +131,8 @@ class FragmentCreatePlaylist : Fragment() {
         }
 
 
-
-
-
     }
+
 
     private fun showDialog() {
         MaterialAlertDialogBuilder(requireContext())

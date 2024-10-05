@@ -6,6 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.practicum.playlistmaker.mediateka.domain.api.PlaylistInteractor
+import com.practicum.playlistmaker.mediateka.models.Playlist
 import com.practicum.playlistmaker.player.domain.api.MediaPlayerInteractor
 import com.practicum.playlistmaker.player.models.PlayerState
 import com.practicum.playlistmaker.player.models.State
@@ -22,7 +24,8 @@ import java.util.Locale
 
 class TrackInfoViewModel(
     private val track: Track,
-    private val mediaPlayerInteractor: MediaPlayerInteractor
+    private val mediaPlayerInteractor: MediaPlayerInteractor,
+    private val playlistInteractor: PlaylistInteractor
 ) : ViewModel() {
 
     private var listOfTracksId: List<Long> = listOf()
@@ -37,11 +40,25 @@ class TrackInfoViewModel(
     private val statePlayerLiveData = MutableLiveData<State>()
     fun getPlayerState(): LiveData<State> = statePlayerLiveData
 
+    private val _playlists = MutableLiveData<List<Playlist>>()
+    val playlists : MutableLiveData<List<Playlist>> = _playlists
+
+    fun getPlaylists(){
+        job?.cancel()
+        job = viewModelScope.launch {
+
+            val listOfPlaylist = playlistInteractor.getPlaylists()
+            playlists.value = listOfPlaylist
+        }
+    }
+
     init {
         getTracksId()
         updateLikedStatus()
         println(listOfTracksId)
     }
+
+
 
     private fun updateLikedStatus() {
         if (listOfTracksId.contains(track.trackId)) {

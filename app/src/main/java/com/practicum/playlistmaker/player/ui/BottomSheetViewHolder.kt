@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.mediateka.ui
+package com.practicum.playlistmaker.player.ui
 
 import android.view.View
 import android.widget.ImageView
@@ -11,11 +11,11 @@ import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.mediateka.models.Playlist
 import com.practicum.playlistmaker.utils.DateTimeUtil
 
-class PlaylistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class BottomSheetViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    private val playlistImage: ImageView = itemView.findViewById(R.id.playlistImage)
-    private val playlistName: TextView = itemView.findViewById(R.id.playlistName)
-    private val playlistNumberOfTracks: TextView = itemView.findViewById(R.id.numberOfTracks)
+    private val playlistImage: ImageView = itemView.findViewById(R.id.playlistImageBS)
+    private val playlistName: TextView = itemView.findViewById(R.id.playlistNameBS)
+    private val playlistNumberOfTracks: TextView = itemView.findViewById(R.id.numberOfTracksBS)
 
     fun bind(playlist: Playlist) {
         Glide.with(itemView).load(playlist.image.toUri())
@@ -30,5 +30,4 @@ class PlaylistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 //        }
 
     }
-
 }

@@ -9,12 +9,17 @@ class PlaylistRepositoryImpl(
     private val playlistDataBase: PlaylistDataBase,
     private val converter: PlaylistDbConverter
 ) : PlaylistRepository {
-    override fun addPlaylist(playlist: Playlist) {
-        playlistDataBase.trackDao().insertPlaylist(converter.mapPlaylistToPlaylistEntity(playlist))
+    override suspend fun addPlaylist(playlist: Playlist) {
+        val playlistEntity = converter.mapPlaylistToPlaylistEntity(playlist)
+        playlistDataBase.trackDao().insertPlaylist(playlistEntity)
     }
 
-    override fun getListOfPlaylists(): List<Playlist> {
-        TODO("Not yet implemented")
+    override suspend fun getPlaylists(): List<Playlist> {
+        val playlistEntityList = playlistDataBase.trackDao().getCreatedPlaylists()
+        val playlistList = playlistEntityList.map { playlistEntity ->
+            converter.mapPlaylistEntityToPlaylist(playlistEntity)
+        }
+        return playlistList
     }
 
 

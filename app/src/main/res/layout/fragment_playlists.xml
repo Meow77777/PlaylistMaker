@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/SettingsBackgroundColorStyle"
@@ -46,7 +48,7 @@
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/addNewPlaylist"
         />
-    
+
     <TextView
         android:id="@+id/playlistCreatedNotify"
         android:layout_width="match_parent"
@@ -57,9 +59,9 @@
         android:padding="@dimen/padding16"
         android:gravity="center"
         android:textSize="@dimen/text_size_14"
+        android:visibility="gone"
         android:layout_marginHorizontal="@dimen/padding8"
         android:layout_marginBottom="@dimen/padding16"
-        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         />
 

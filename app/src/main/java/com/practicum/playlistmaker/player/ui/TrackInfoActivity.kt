@@ -1,13 +1,26 @@
 package com.practicum.playlistmaker.player.ui
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.mediateka.models.Playlist
+import com.practicum.playlistmaker.mediateka.ui.FragmentCreatePlaylist
 import com.practicum.playlistmaker.player.models.State
 import com.practicum.playlistmaker.player.models.TrackDetailsInfo
 import com.practicum.playlistmaker.player.presentation.TrackDetailsMapper
@@ -35,6 +48,14 @@ class TrackInfoActivity : AppCompatActivity() {
     private lateinit var country: TextView
     private lateinit var timerTextView: TextView
     private lateinit var likeButton: ImageButton
+    private lateinit var addToPlaylist: ImageButton
+    private lateinit var bottomSheet: LinearLayout
+    private lateinit var bottomSheetAdapter: BottomSheetAdapter
+    private lateinit var listOfPlaylists: List<Playlist>
+    private lateinit var playlistRecycler: RecyclerView
+    private lateinit var createPlaylist : Button
+    private lateinit var fragmentContainer : FrameLayout
+    private lateinit var constraintLayout: ConstraintLayout
 
     private var likedStatus = false
 
@@ -60,6 +81,12 @@ class TrackInfoActivity : AppCompatActivity() {
         country = findViewById(R.id.songCountryTrackInfo)
         timerTextView = findViewById(R.id.songCurrentTimeTrackInfo)
         likeButton = findViewById(R.id.likeSongTrackInfo)
+        addToPlaylist = findViewById(R.id.addToFavorTrackInfo)
+        bottomSheet = findViewById(R.id.standard_bottom_sheet)
+        playlistRecycler = findViewById(R.id.playlistRecyclerBS)
+        createPlaylist = findViewById(R.id.addNewPlaylist)
+        fragmentContainer = findViewById(R.id.fragment_container)
+        constraintLayout = findViewById(R.id.constraintLayout)
 
         trackIntent = intent.getParcelableExtra("track")!!
 
@@ -78,7 +105,7 @@ class TrackInfoActivity : AppCompatActivity() {
         }
 
         likeButton.setOnClickListener {
-            when (likedStatus){
+            when (likedStatus) {
                 true -> vm.deleteTrackFromFavor(trackIntent)
                 false -> vm.addTrackToFavor(trackIntent)
             }
@@ -98,10 +125,6 @@ class TrackInfoActivity : AppCompatActivity() {
             }
         }
 
-//        vm.getTimerLiveData().observe(this) { time ->
-//            timerTextView.text = time
-//        }
-
 
         play.setOnClickListener {
             vm.changeState()
@@ -111,6 +134,38 @@ class TrackInfoActivity : AppCompatActivity() {
             finish()
         }
 
+        //РАБОТА С BottomSheet
+        listOfPlaylists = mutableListOf()
+        bottomSheetAdapter = BottomSheetAdapter(listOfPlaylists)
+        playlistRecycler.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        vm.playlists.observe(this) { playlists ->
+            if (playlists.isEmpty()) {
+
+            } else {
+                listOfPlaylists = playlists
+                println(listOfPlaylists)
+                bottomSheetAdapter = BottomSheetAdapter(listOfPlaylists)
+                playlistRecycler.adapter = bottomSheetAdapter
+                bottomSheetAdapter.notifyDataSetChanged()
+            }
+        }
+
+        val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+        }
+
+        addToPlaylist.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+        }
+
+        createPlaylist.setOnClickListener {
+            constraintLayout.visibility = View.GONE
+            bottomSheet.visibility = View.GONE
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, FragmentCreatePlaylist())
+                .addToBackStack(null)
+                .commit()
+        }
 
     }
 
@@ -134,6 +189,11 @@ class TrackInfoActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         vm.releasePlayer()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        vm.getPlaylists()
     }
 
     private fun preparePlayer() {

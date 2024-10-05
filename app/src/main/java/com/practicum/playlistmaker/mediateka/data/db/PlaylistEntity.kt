@@ -8,8 +8,8 @@ import com.practicum.playlistmaker.search.models.Track
 data class PlaylistEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long?,
-    val playlistName: String?,
-    val numberOfTracks: Long,
-    val playlistImage: String,
-    val tracks: MutableList<Track>
+    val name: String,
+    val description : String,
+    val image: String,
+    val tracks : String
 )

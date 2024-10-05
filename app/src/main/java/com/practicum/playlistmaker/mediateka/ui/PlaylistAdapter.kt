@@ -6,10 +6,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.mediateka.models.Playlist
 
-class PlaylistAdapter(private val playlists: MutableList<Playlist>) :
+class PlaylistAdapter(private val playlists: List<Playlist>) :
     RecyclerView.Adapter<PlaylistViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.list_element, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.playlist_element, parent, false)
         return PlaylistViewHolder(view)
     }
 
