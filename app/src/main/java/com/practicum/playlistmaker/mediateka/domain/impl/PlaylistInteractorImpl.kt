@@ -12,4 +12,8 @@ class PlaylistInteractorImpl(private val playlistRepository: PlaylistRepository)
     override suspend fun getPlaylists(): List<Playlist> {
         return playlistRepository.getPlaylists()
     }
+
+    override suspend fun updatePlaylist(playlist: Playlist) {
+        playlistRepository.updatePlaylist(playlist)
+    }
 }

@@ -11,7 +11,7 @@ class PlaylistDbConverter {
     fun mapPlaylistToPlaylistEntity(playlist: Playlist): PlaylistEntity {
         val listToJson = Gson().toJson(playlist.tracks)
         return PlaylistEntity(
-            id = null,
+            id = playlist.id,
             name = playlist.name,
             description = playlist.description,
             image = playlist.image,
@@ -20,11 +20,11 @@ class PlaylistDbConverter {
     }
 
     fun mapPlaylistEntityToPlaylist(playlistEntity: PlaylistEntity): Playlist {
-        val jsonToList = Gson().fromJson<List<Track>>(
-            playlistEntity.tracks,
-            object : TypeToken<MutableList<Track>>() {}.type
+        val jsonToList = Gson().fromJson<MutableList<Track>>(
+            playlistEntity.tracks, object : TypeToken<MutableList<Track>>() {}.type
         )
         return Playlist(
+            id = playlistEntity.id,
             name = playlistEntity.name,
             description = playlistEntity.description,
             image = playlistEntity.image,

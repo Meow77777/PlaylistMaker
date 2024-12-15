@@ -64,6 +64,7 @@
             android:id="@+id/editTextNamePlaylist"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxLines="1"
             android:hint="@string/playlistName" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -85,6 +86,7 @@
             android:id="@+id/editTextDescriptionPlaylist"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxLines="1"
             android:hint="@string/playlistDescription" />
 
     </com.google.android.material.textfield.TextInputLayout>

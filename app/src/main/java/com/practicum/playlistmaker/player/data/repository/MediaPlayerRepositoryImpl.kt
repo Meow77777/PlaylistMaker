@@ -29,6 +29,7 @@ class MediaPlayerRepositoryImpl(
 
     override fun preparePlayer(url: String) {
         mediaPlayer.apply {
+            mediaPlayer.reset()
             mediaPlayer.setDataSource(url)
             mediaPlayer.prepareAsync()
             mediaPlayer.setOnPreparedListener {

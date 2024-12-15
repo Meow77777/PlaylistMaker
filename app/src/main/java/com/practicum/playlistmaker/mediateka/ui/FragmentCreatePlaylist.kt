@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
@@ -32,11 +33,10 @@ class FragmentCreatePlaylist : Fragment() {
 
     private lateinit var binding: FragmentCreatePlaylistBinding
     private val vm by viewModel<FragmentCreatePlaylistViewModel>()
-    private lateinit var imageUri: Uri
+    private var imageUri: Uri? = null
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentCreatePlaylistBinding.inflate(inflater, container, false)
         return binding.root
@@ -49,13 +49,10 @@ class FragmentCreatePlaylist : Fragment() {
 
         val pickMedia =
             registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-                //обрабатываем событие выбора пользователем фотографии
                 if (uri != null) {
                     //binding.addPlaylistImage.setImageURI(uri)
                     binding.addPlaylistImage.scaleType = ImageView.ScaleType.FIT_XY
-                    Glide.with(binding.addPlaylistImage)
-                        .load(uri)
-                        .fitCenter()
+                    Glide.with(binding.addPlaylistImage).load(uri).fitCenter()
                         .transform(RoundedCorners(DateTimeUtil.dpToPx(8f, requireContext())))
                         .into(binding.addPlaylistImage)
 
@@ -70,7 +67,6 @@ class FragmentCreatePlaylist : Fragment() {
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
 
-
         binding.editTextNamePlaylist.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
@@ -82,42 +78,25 @@ class FragmentCreatePlaylist : Fragment() {
         })
 
         binding.createPlaylistButton.setOnClickListener {
-
             if (binding.createPlaylistButton.isEnabled) {
+                val playlistImageUri = if (imageUri != null) imageUri.toString() else ""
                 val newPlaylist = Playlist(
                     name = binding.editTextNamePlaylist.text.toString(),
                     description = binding.editTextDescriptionPlaylist.text.toString(),
-                    image = imageUri.toString(),
+                    image = playlistImageUri,
                     tracks = mutableListOf()
                 )
                 vm.addPlaylist(playlist = newPlaylist)
 
                 val navController = findNavController()
 
-                // Получаем SavedStateHandle у предыдущего фрагмента через NavController
-                navController.previousBackStackEntry?.savedStateHandle?.set(
-                    "playlistName",
-                    binding.editTextNamePlaylist.text.toString()
-                )
+                Toast.makeText(
+                    requireContext(),
+                    "Плейлист ${binding.editTextNamePlaylist.text.toString()} создан",
+                    Toast.LENGTH_LONG
+                ).show()
 
-                // Возврат на предыдущий фрагмент
                 navController.popBackStack()
-
-//                parentFragmentManager.setFragmentResult("playlistCreated", Bundle().apply {
-//                    putString("playlistName", binding.editTextNamePlaylist.text.toString())
-//                })
-//                Toast.makeText(
-//                    requireContext(),
-//                    "Плейлист ${binding.editTextNamePlaylist.text.toString()} создан",
-//                    Toast.LENGTH_LONG
-//                ).show()
-//                val playlistsFragment =
-//                    parentFragmentManager.findFragmentById(R.id.createdPlaylists) as? FragmentPlaylists
-//                playlistsFragment?.arguments = Bundle().apply {
-//                    putBoolean("showToast", true)
-//                    putString("playlistName", binding.editTextNamePlaylist.text.toString())
-//                }
-//                findNavController().popBackStack()
 
             }
         }
@@ -129,45 +108,29 @@ class FragmentCreatePlaylist : Fragment() {
                 findNavController().popBackStack()
             }
         }
-
-
     }
 
-
     private fun showDialog() {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Завершить создание плейлиста?")
-            .setMessage("Все несохраненные данные будут потеряны")
-            .setNegativeButton("Отмена") { dialog, which ->
+        MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.finishPlaylistCreating)
+            .setMessage(R.string.dataWillLost).setNegativeButton(R.string.cancel) { _, _ ->
                 //ничего не делаем
-            }
-            .setPositiveButton("Завершить") { dialog, which ->
+            }.setPositiveButton(R.string.complete) { _, _ ->
                 findNavController().popBackStack()
-            }
-            .show()
+            }.show()
     }
 
     private fun saveImageToPrivateStorage(uri: Uri) {
-        //создаём экземпляр класса File, который указывает на нужный каталог
         val filePath = File(
-            requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-            "myalbum"
+            requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "myalbum"
         )
-        //создаем каталог, если он не создан
         if (!filePath.exists()) {
             filePath.mkdirs()
         }
-        //создаём экземпляр класса File, который указывает на файл внутри каталога
         val file = File(filePath, "first_cover.jpg")
-        // создаём входящий поток байтов из выбранной картинки
         val inputStream = requireContext().contentResolver.openInputStream(uri)
-        // создаём исходящий поток байтов в созданный выше файл
         val outputStream = FileOutputStream(file)
-        // записываем картинку с помощью BitmapFactory
-        BitmapFactory
-            .decodeStream(inputStream)
+        BitmapFactory.decodeStream(inputStream)
             .compress(Bitmap.CompressFormat.JPEG, 30, outputStream)
     }
-
 
 }

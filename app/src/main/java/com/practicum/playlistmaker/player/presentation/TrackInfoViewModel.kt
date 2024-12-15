@@ -46,19 +46,23 @@ class TrackInfoViewModel(
     fun getPlaylists(){
         job?.cancel()
         job = viewModelScope.launch {
-
             val listOfPlaylist = playlistInteractor.getPlaylists()
-            playlists.value = listOfPlaylist
+            _playlists.value = listOfPlaylist
         }
     }
 
     init {
         getTracksId()
         updateLikedStatus()
-        println(listOfTracksId)
     }
 
-
+    fun addTrackToPlaylist(playlist: Playlist, track: Track) {
+        viewModelScope.launch {
+                playlist.tracks.add(track)
+                playlistInteractor.updatePlaylist(playlist)
+                getPlaylists()
+        }
+    }
 
     private fun updateLikedStatus() {
         if (listOfTracksId.contains(track.trackId)) {
@@ -119,6 +123,10 @@ class TrackInfoViewModel(
             mediaPlayerInteractor.preparePlayer(track.previewUrl!!)
         }
         handler.post(playerRun)
+    }
+
+    fun pausePlayer(){
+        mediaPlayerInteractor.pause()
     }
 
     fun changeState() {

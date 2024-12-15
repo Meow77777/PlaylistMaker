@@ -4,6 +4,8 @@ import com.practicum.playlistmaker.mediateka.data.db.PlaylistDataBase
 import com.practicum.playlistmaker.mediateka.data.db.converters.PlaylistDbConverter
 import com.practicum.playlistmaker.mediateka.domain.repository.PlaylistRepository
 import com.practicum.playlistmaker.mediateka.models.Playlist
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class PlaylistRepositoryImpl(
     private val playlistDataBase: PlaylistDataBase,
@@ -22,5 +24,11 @@ class PlaylistRepositoryImpl(
         return playlistList
     }
 
+    override suspend fun updatePlaylist(playlist: Playlist) {
+        withContext(Dispatchers.IO) {
+            val playlistEntity = converter.mapPlaylistToPlaylistEntity(playlist)
+            playlistDataBase.trackDao().updatePlaylist(playlistEntity)
+        }
+    }
 
 }

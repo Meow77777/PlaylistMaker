@@ -5,22 +5,21 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
+import androidx.room.Update
 import com.practicum.playlistmaker.mediateka.data.db.PlaylistEntity
-import com.practicum.playlistmaker.player.data.db.TrackEntity
-import com.practicum.playlistmaker.search.models.Track
 
 @Dao
 interface PlaylistDao {
-    @Insert(entity = PlaylistEntity::class, onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPlaylist(playlistEntity: PlaylistEntity)
 
-    @Delete(entity = PlaylistEntity::class)
+    @Delete
     suspend fun deletePlaylist(playlistEntity: PlaylistEntity)
 
-    @Query("SELECT * FROM CREATED_PLAYLISTS ORDER BY id DESC")
+    @Query("SELECT * FROM created_playlists")
     suspend fun getCreatedPlaylists(): List<PlaylistEntity>
 
-
+    @Update
+    fun updatePlaylist(playlistEntity: PlaylistEntity)
 
 }

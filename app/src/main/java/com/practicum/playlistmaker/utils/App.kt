@@ -24,6 +24,8 @@ class App : Application() {
         val sharedPreferences = getSharedPreferences(MY_PREFS, MODE_PRIVATE)
         val switchStatus = sharedPreferences.getBoolean(SWITCH_STATUS, false)
         switchTheme(switchStatus)
+
+
     }
 
 
