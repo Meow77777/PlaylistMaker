@@ -13,8 +13,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -34,6 +36,7 @@ class FragmentCreatePlaylist : Fragment() {
     private lateinit var binding: FragmentCreatePlaylistBinding
     private val vm by viewModel<FragmentCreatePlaylistViewModel>()
     private var imageUri: Uri? = null
+    private var hasUnsavedChanges = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -108,6 +111,24 @@ class FragmentCreatePlaylist : Fragment() {
                 findNavController().popBackStack()
             }
         }
+
+        binding.editTextNamePlaylist.addTextChangedListener {
+            hasUnsavedChanges = !it.isNullOrEmpty()
+        }
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (hasUnsavedChanges) {
+                        showDialog()
+                    } else {
+                        isEnabled = false
+                        requireActivity().onBackPressed()
+                    }
+                }
+            }
+        )
     }
 
     private fun showDialog() {

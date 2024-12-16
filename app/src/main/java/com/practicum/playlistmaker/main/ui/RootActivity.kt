@@ -31,8 +31,6 @@ class RootActivity : AppCompatActivity() {
                 else -> showBottomNav()
             }
         }
-
-
     }
 
     private fun hideBottomNav() {

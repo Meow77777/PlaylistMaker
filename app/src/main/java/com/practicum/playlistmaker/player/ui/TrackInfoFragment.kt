@@ -12,6 +12,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -108,6 +109,8 @@ class TrackInfoFragment : Fragment() {
         darkFrame = binding.darkFrame
 
         track = arguments?.getParcelable<Track>("track")!!
+
+        vm.currentTrack = track
 
         vm.getLikedStatusLiveData().observe(viewLifecycleOwner) { status ->
             when (status) {
@@ -251,6 +254,7 @@ class TrackInfoFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        timerTextView.text = getString(R.string.songZero)
         super.onDestroyView()
         vm.releasePlayer()
     }
@@ -263,7 +267,7 @@ class TrackInfoFragment : Fragment() {
 
     private fun preparePlayer() {
         play.setImageResource(R.drawable.play_song_button_mediateka)
-        timerTextView.text = R.string.songZero.toString()
+        timerTextView.text = getString(R.string.songZero)
     }
 
     private fun showPlayButton() {

@@ -30,6 +30,7 @@ class TrackInfoViewModel(
 
     private var listOfTracksId: List<Long> = listOf()
     private var job: Job? = null
+    var currentTrack: Track? = null
 
     private val isLikedLiveData = MutableLiveData<Boolean>()
     fun getLikedStatusLiveData(): LiveData<Boolean> = isLikedLiveData
@@ -58,9 +59,9 @@ class TrackInfoViewModel(
 
     fun addTrackToPlaylist(playlist: Playlist, track: Track) {
         viewModelScope.launch {
-                playlist.tracks.add(track)
-                playlistInteractor.updatePlaylist(playlist)
-                getPlaylists()
+            playlist.tracks.add(track)
+            playlistInteractor.updatePlaylist(playlist)
+            getPlaylists()
         }
     }
 
@@ -112,17 +113,15 @@ class TrackInfoViewModel(
                 withContext(Dispatchers.Main) {
                     statePlayerLiveData.postValue(State.Timer(time))
                 }
-
             }
         }
 
     }
 
     fun loadPlayer() {
-        val playerRun = Runnable {
+        currentTrack?.let { track ->
             mediaPlayerInteractor.preparePlayer(track.previewUrl!!)
         }
-        handler.post(playerRun)
     }
 
     fun pausePlayer(){
@@ -137,6 +136,7 @@ class TrackInfoViewModel(
         mediaPlayerInteractor.releasePlayer()
         jobTimer?.cancel()
         jobState?.cancel()
+        renderState(State.Timer("00:00"))
     }
 
     private fun getAutoCurrentState() {
@@ -195,5 +195,6 @@ class TrackInfoViewModel(
         super.onCleared()
         jobTimer?.cancel()
         jobState?.cancel()
+        renderState(State.Timer("00:00"))
     }
 }
