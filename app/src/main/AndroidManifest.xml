@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <application
         android:name="com.practicum.playlistmaker.utils.App"
         android:allowBackup="true"
@@ -14,9 +15,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"
         tools:targetApi="31">
-        <activity
-            android:name=".player.ui.TrackInfoActivity"
-            android:exported="false" />
 
         <activity
             android:name=".main.ui.RootActivity"

@@ -1,5 +1,7 @@
 package com.practicum.playlistmaker.di
 
+import com.practicum.playlistmaker.mediateka.domain.api.PlaylistInteractor
+import com.practicum.playlistmaker.mediateka.domain.impl.PlaylistInteractorImpl
 import com.practicum.playlistmaker.player.domain.api.MediaPlayerInteractor
 import com.practicum.playlistmaker.player.domain.impl.MediaPlayerInteractorImpl
 import com.practicum.playlistmaker.search.domain.entity.api.TracksInteractor
@@ -14,6 +16,10 @@ val domainModule = module {
 
     factory<TracksInteractor> {
         TracksInteractorImpl(repository = get())
+    }
+
+    factory <PlaylistInteractor>{
+        PlaylistInteractorImpl(playlistRepository = get())
     }
 
     factory<MediaPlayerInteractor> {

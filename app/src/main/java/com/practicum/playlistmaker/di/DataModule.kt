@@ -4,6 +4,10 @@ import android.content.Context
 import android.media.MediaPlayer
 import androidx.room.Room
 import com.google.gson.Gson
+import com.practicum.playlistmaker.mediateka.data.db.PlaylistDataBase
+import com.practicum.playlistmaker.mediateka.data.db.converters.PlaylistDbConverter
+import com.practicum.playlistmaker.mediateka.data.repository.PlaylistRepositoryImpl
+import com.practicum.playlistmaker.mediateka.domain.repository.PlaylistRepository
 import com.practicum.playlistmaker.player.data.db.AppDatabase
 import com.practicum.playlistmaker.player.data.db.converters.TrackDbConverter
 import com.practicum.playlistmaker.player.data.repository.MediaPlayerRepositoryImpl
@@ -39,6 +43,20 @@ val dataModule = module {
         Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db")
             .fallbackToDestructiveMigration()
             .build()
+    }
+
+    single {
+        Room.databaseBuilder(androidContext(), PlaylistDataBase::class.java, "database.db2")
+            .fallbackToDestructiveMigration()
+            .build()
+    }
+
+    factory <PlaylistDbConverter>{
+        PlaylistDbConverter()
+    }
+
+    factory <PlaylistRepository>{
+        PlaylistRepositoryImpl(playlistDataBase = get(), converter = get())
     }
 
     single {

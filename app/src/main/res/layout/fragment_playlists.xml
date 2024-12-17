@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/SettingsBackgroundColorStyle"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.practicum.playlistmaker.mediateka.ui.FragmentPlaylists">
-    >
+
 
     <Button
         android:id="@+id/addNewPlaylist"
         style="@style/ResetButtonSearch"
         android:layout_marginTop="@dimen/size24"
-        android:text="@string/addNewPlaylist"
+        android:text="@string/newPlaylist"
         app:layout_constraintBottom_toTopOf="@id/mediatekaIsEmpty"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -35,7 +37,33 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/mediatekaIsEmpty"
-
         />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id = "@+id/createdPlaylists"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/padding16"
+        android:layout_marginHorizontal="@dimen/padding16"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/addNewPlaylist"
+        />
+
+    <TextView
+        android:id="@+id/playlistCreatedNotify"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="Плейлист Best Songs создан"
+        android:textColor="@color/white"
+        android:background="@color/black_main"
+        android:padding="@dimen/padding16"
+        android:gravity="center"
+        android:textSize="@dimen/text_size_14"
+        android:visibility="gone"
+        android:layout_marginHorizontal="@dimen/padding8"
+        android:layout_marginBottom="@dimen/padding16"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

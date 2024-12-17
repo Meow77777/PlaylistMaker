@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.di
 
+import com.practicum.playlistmaker.mediateka.presentation.FragmentCreatePlaylistViewModel
 import com.practicum.playlistmaker.mediateka.presentation.FragmentLikedTracksViewModel
 import com.practicum.playlistmaker.mediateka.presentation.FragmentPlaylistsViewModel
 import com.practicum.playlistmaker.player.presentation.TrackInfoViewModel
@@ -12,7 +13,7 @@ import org.koin.dsl.module
 val appModule = module {
 
     viewModel<TrackInfoViewModel> { (track: Track) ->
-        TrackInfoViewModel(track, mediaPlayerInteractor = get())
+        TrackInfoViewModel(track, mediaPlayerInteractor = get(), playlistInteractor = get())
     }
 
     viewModel<SettingsViewModel> {
@@ -28,7 +29,11 @@ val appModule = module {
     }
 
     viewModel<FragmentPlaylistsViewModel> {
-        FragmentPlaylistsViewModel()
+        FragmentPlaylistsViewModel(playlistInteractor = get())
+    }
+
+    viewModel<FragmentCreatePlaylistViewModel> {
+        FragmentCreatePlaylistViewModel(playlistInteractor = get())
     }
 
 }

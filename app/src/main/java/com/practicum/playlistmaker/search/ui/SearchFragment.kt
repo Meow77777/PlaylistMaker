@@ -2,7 +2,6 @@ package com.practicum.playlistmaker.search.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -18,10 +17,12 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavOptions
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentSearchBinding
-import com.practicum.playlistmaker.player.ui.TrackInfoActivity
 import com.practicum.playlistmaker.search.models.Track
 import com.practicum.playlistmaker.search.presentation.SearchTracksViewModel
 import com.practicum.playlistmaker.search.presentation.state.TracksState
@@ -65,7 +66,7 @@ class SearchFragment : Fragment() {
     private lateinit var binding: FragmentSearchBinding
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentSearchBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
@@ -105,11 +106,15 @@ class SearchFragment : Fragment() {
             AdapterHistoryTracks(tracksListHistory, object : SongSearchAdapter.Listener {
                 override fun onClick(track: Track) {
                     if (clickDebounce()) {
-                        val trackInfoActivityIntent =
-                            Intent(requireContext(), TrackInfoActivity::class.java)
-                        trackInfoActivityIntent.putExtra("track", track)
-                        startActivity(trackInfoActivityIntent)
-
+                        val bundle = Bundle().apply {
+                            putParcelable("track", track)
+                        }
+                        findNavController().navigate(
+                            R.id.action_searchFragment_to_trackInfoFragment,
+                            bundle,
+                            navOptions = NavOptions.Builder().setPopUpTo(R.id.searchFragment, true)
+                                .build()
+                        )
                     }
                 }
 
@@ -120,11 +125,14 @@ class SearchFragment : Fragment() {
         adapter = SongSearchAdapter(tracks, object : SongSearchAdapter.Listener {
             override fun onClick(track: Track) {
                 if (clickDebounce()) {
-                    val trackInfoActivityIntent =
-                        Intent(requireContext(), TrackInfoActivity::class.java)
-                    trackInfoActivityIntent.putExtra("track", track)
                     vm.addToHistory(track = track)
-                    startActivity(trackInfoActivityIntent)
+                    val bundle = Bundle().apply {
+                        putParcelable("track", track)
+                    }
+
+                    findNavController().navigate(
+                        R.id.action_searchFragment_to_trackInfoFragment, bundle
+                    )
                 }
             }
         })
@@ -232,10 +240,10 @@ class SearchFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-
         editText.text.clear()
         vm.clearLiveDataTrackState()
         simpleTextWatcher.let { binding.editText.removeTextChangedListener(it) }
+
         super.onDestroyView()
     }
 
@@ -302,10 +310,10 @@ class SearchFragment : Fragment() {
             AdapterHistoryTracks(tracksListHistory, object : SongSearchAdapter.Listener {
                 override fun onClick(track: Track) {
                     if (clickDebounce()) {
-                        val trackInfoActivityIntent =
-                            Intent(requireContext(), TrackInfoActivity::class.java)
-                        trackInfoActivityIntent.putExtra("track", track)
-                        startActivity(trackInfoActivityIntent)
+                        val bundle = Bundle().apply {
+                            putParcelable("track", track)
+                        }
+                        findNavController().navigate(R.id.trackInfoFragment, bundle)
                     }
                 }
             })
@@ -337,7 +345,7 @@ class SearchFragment : Fragment() {
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
-            viewLifecycleOwner.lifecycleScope.launch {
+            lifecycleScope.launch {
                 delay(1000L)
                 isClickAllowed = true
             }

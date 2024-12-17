@@ -1,0 +1,35 @@
+package com.practicum.playlistmaker.mediateka.data.db.converters
+
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.practicum.playlistmaker.mediateka.data.db.PlaylistEntity
+import com.practicum.playlistmaker.mediateka.models.Playlist
+import com.practicum.playlistmaker.search.models.Track
+
+class PlaylistDbConverter {
+
+    fun mapPlaylistToPlaylistEntity(playlist: Playlist): PlaylistEntity {
+        val listToJson = Gson().toJson(playlist.tracks)
+        return PlaylistEntity(
+            id = playlist.id,
+            name = playlist.name,
+            description = playlist.description,
+            image = playlist.image,
+            tracks = listToJson
+        )
+    }
+
+    fun mapPlaylistEntityToPlaylist(playlistEntity: PlaylistEntity): Playlist {
+        val jsonToList = Gson().fromJson<MutableList<Track>>(
+            playlistEntity.tracks, object : TypeToken<MutableList<Track>>() {}.type
+        )
+        return Playlist(
+            id = playlistEntity.id,
+            name = playlistEntity.name,
+            description = playlistEntity.description,
+            image = playlistEntity.image,
+            tracks = jsonToList
+        )
+    }
+
+}
