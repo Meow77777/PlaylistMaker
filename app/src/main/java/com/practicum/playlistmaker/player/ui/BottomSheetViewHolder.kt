@@ -28,8 +28,6 @@ class BottomSheetViewHolder(itemView: View, private val listener: BottomSheetAda
         itemView.setOnClickListener {
             listener.onClick(playlist)
         }
-
-
     }
 
     private fun getTrackCountText(count: Int): String {
