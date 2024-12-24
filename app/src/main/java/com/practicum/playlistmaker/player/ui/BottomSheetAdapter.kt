@@ -22,6 +22,7 @@ class BottomSheetAdapter(private val playlists: List<Playlist>, private val list
 
     override fun onBindViewHolder(holder: BottomSheetViewHolder, position: Int) {
         holder.bind(playlists[position])
+        holder.bind(playlists[position])
     }
 
     interface Listener {
