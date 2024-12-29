@@ -40,5 +40,10 @@ class BottomSheetTrackViewHolder(itemView: View, private val listener: BottomShe
             listener.onClick(track = track)
         }
 
+        itemView.setOnLongClickListener {
+            listener.onLongClick(track = track)
+            true
+        }
+
     }
 }

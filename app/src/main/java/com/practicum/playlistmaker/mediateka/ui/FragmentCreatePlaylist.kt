@@ -1,5 +1,7 @@
 package com.practicum.playlistmaker.mediateka.ui
 
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -16,6 +18,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.net.toUri
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -49,11 +52,27 @@ class FragmentCreatePlaylist : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.createPlaylistButton.isEnabled = false
+        val playlistToEdit = arguments?.getParcelable<Playlist>("playlist_to_edit")
+
+        if (playlistToEdit != null) {
+            binding.createPlaylistButton.isEnabled = true
+            binding.title.text = getString(R.string.edit)
+            binding.createPlaylistButton.text = getString(R.string.save)
+
+            binding.editTextNamePlaylist.setText(playlistToEdit.name)
+            binding.editTextDescriptionPlaylist.setText(playlistToEdit.description)
+            binding.addPlaylistImage.scaleType = ImageView.ScaleType.FIT_XY
+            Glide.with(requireContext()).load(playlistToEdit.image?.toUri())
+                .placeholder(R.drawable.placeholder)
+                .transform(RoundedCorners(DateTimeUtil.dpToPx(8f, requireContext())))
+                .into(binding.addPlaylistImage)
+        }
 
         val pickMedia =
             registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
                 if (uri != null) {
-                    //binding.addPlaylistImage.setImageURI(uri)
+                    val resolver = requireContext().contentResolver
+                    resolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     binding.addPlaylistImage.scaleType = ImageView.ScaleType.FIT_XY
                     Glide.with(binding.addPlaylistImage).load(uri).fitCenter()
                         .transform(RoundedCorners(DateTimeUtil.dpToPx(8f, requireContext())))
@@ -82,30 +101,38 @@ class FragmentCreatePlaylist : Fragment() {
 
         binding.createPlaylistButton.setOnClickListener {
             if (binding.createPlaylistButton.isEnabled) {
-                val playlistImageUri = if (imageUri != null) imageUri.toString() else ""
-                val newPlaylist = Playlist(
-                    name = binding.editTextNamePlaylist.text.toString(),
-                    description = binding.editTextDescriptionPlaylist.text.toString(),
-                    image = playlistImageUri,
-                    tracks = mutableListOf()
-                )
-                vm.addPlaylist(playlist = newPlaylist)
+                if (playlistToEdit != null) {
+                    playlistToEdit.apply {
+                        name = binding.editTextNamePlaylist.text.toString()
+                        description = binding.editTextDescriptionPlaylist.text.toString()
+                        image = if (imageUri != null) imageUri.toString() else image
+                    }
+                    saveChanges(playlistToEdit)
+                } else {
+                    val playlistImageUri = if (imageUri != null) imageUri.toString() else ""
+                    val newPlaylist = Playlist(
+                        name = binding.editTextNamePlaylist.text.toString(),
+                        description = binding.editTextDescriptionPlaylist.text.toString(),
+                        image = playlistImageUri,
+                        tracks = mutableListOf()
+                    )
+                    vm.addPlaylist(playlist = newPlaylist)
 
-                val navController = findNavController()
+                    Toast.makeText(
+                        requireContext(),
+                        "Плейлист ${binding.editTextNamePlaylist.text.toString()} создан",
+                        Toast.LENGTH_LONG
+                    ).show()
 
-                Toast.makeText(
-                    requireContext(),
-                    "Плейлист ${binding.editTextNamePlaylist.text.toString()} создан",
-                    Toast.LENGTH_LONG
-                ).show()
-
-                navController.popBackStack()
-
+                    findNavController().popBackStack()
+                }
             }
         }
 
         binding.backFromCreatePlaylist.setOnClickListener {
-            if ((binding.editTextNamePlaylist.text?.isNotEmpty() == true) or (binding.editTextDescriptionPlaylist.text?.isNotEmpty() == true) or (binding.addPlaylistImage.drawable != null)) {
+            if (playlistToEdit != null) {
+                findNavController().popBackStack()
+            } else if ((binding.editTextNamePlaylist.text?.isNotEmpty() == true) or (binding.editTextDescriptionPlaylist.text?.isNotEmpty() == true) or (binding.addPlaylistImage.drawable != null)) {
                 showDialog()
             } else {
                 findNavController().popBackStack()
@@ -116,19 +143,30 @@ class FragmentCreatePlaylist : Fragment() {
             hasUnsavedChanges = !it.isNullOrEmpty()
         }
 
-        requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    if (hasUnsavedChanges) {
+                    if (playlistToEdit != null) {
+                        findNavController().popBackStack()
+                    } else if (hasUnsavedChanges) {
                         showDialog()
                     } else {
                         isEnabled = false
                         requireActivity().onBackPressed()
                     }
                 }
-            }
-        )
+            })
+    }
+
+    private fun saveChanges(updatedPlaylist: Playlist) {
+        vm.updatePlaylist(updatedPlaylist)
+
+        findNavController().popBackStack()
+
+        val resultIntent = Intent().apply {
+            putExtra("updated_playlist", updatedPlaylist)
+        }
+        requireActivity().setResult(Activity.RESULT_OK, resultIntent)
     }
 
     private fun showDialog() {

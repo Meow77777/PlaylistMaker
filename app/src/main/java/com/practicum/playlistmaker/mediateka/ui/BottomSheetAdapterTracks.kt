@@ -27,5 +27,6 @@ class BottomSheetAdapterTracks(private val tracks: List<Track>, private val list
 
     interface Listener {
         fun onClick(track: Track)
+        fun onLongClick(track: Track)
     }
 }

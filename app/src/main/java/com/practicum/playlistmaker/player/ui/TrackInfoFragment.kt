@@ -208,8 +208,6 @@ class TrackInfoFragment : Fragment() {
             bottomSheetAdapter.notifyDataSetChanged()
         }
 
-
-
         addToPlaylist.setOnClickListener {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
         }

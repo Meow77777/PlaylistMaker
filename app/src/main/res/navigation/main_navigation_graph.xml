@@ -40,6 +40,11 @@
         android:label="fragment_create_playlist"
         tools:layout="@layout/fragment_create_playlist" />
     <fragment
+        android:id="@+id/fragmentCreatePlaylist2"
+        android:name="com.practicum.playlistmaker.mediateka.ui.FragmentCreatePlaylist"
+        android:label="fragment_create_playlist"
+        tools:layout="@layout/fragment_create_playlist" />
+    <fragment
         android:id="@+id/trackInfoFragment"
         android:name="com.practicum.playlistmaker.player.ui.TrackInfoFragment"
         android:label="track_info"
@@ -71,5 +76,8 @@
         <action
             android:id="@+id/action_playlistInfoFragment_to_trackInfoFragment2"
             app:destination="@id/trackInfoFragment2" />
+        <action
+            android:id="@+id/action_playlistInfoFragment_to_fragmentCreatePlaylist2"
+            app:destination="@id/fragmentCreatePlaylist2" />
     </fragment>
 </navigation>

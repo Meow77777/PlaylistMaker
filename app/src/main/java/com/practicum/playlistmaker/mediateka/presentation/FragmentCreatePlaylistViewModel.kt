@@ -6,11 +6,18 @@ import com.practicum.playlistmaker.mediateka.domain.api.PlaylistInteractor
 import com.practicum.playlistmaker.mediateka.models.Playlist
 import kotlinx.coroutines.launch
 
-class FragmentCreatePlaylistViewModel(private val playlistInteractor: PlaylistInteractor) : ViewModel() {
+class FragmentCreatePlaylistViewModel(private val playlistInteractor: PlaylistInteractor) :
+    ViewModel() {
 
     fun addPlaylist(playlist: Playlist) {
         viewModelScope.launch {
             playlistInteractor.addPlaylist(playlist)
+        }
+    }
+
+    fun updatePlaylist(playlist: Playlist) {
+        viewModelScope.launch {
+            playlistInteractor.updatePlaylist(playlist)
         }
     }
 }

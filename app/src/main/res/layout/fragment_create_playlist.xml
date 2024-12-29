@@ -19,6 +19,7 @@
         app:srcCompat="@drawable/back" />
 
     <TextView
+        android:id="@+id/title"
         style="@style/MainTextStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
