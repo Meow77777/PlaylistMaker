@@ -20,6 +20,6 @@ interface PlaylistDao {
     suspend fun getCreatedPlaylists(): List<PlaylistEntity>
 
     @Update
-    fun updatePlaylist(playlistEntity: PlaylistEntity)
+    suspend fun updatePlaylist(playlistEntity: PlaylistEntity)
 
 }

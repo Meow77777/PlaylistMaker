@@ -2,6 +2,7 @@ package com.practicum.playlistmaker.main.ui
 
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
@@ -14,7 +15,7 @@ class RootActivity : AppCompatActivity() {
     private lateinit var bottomNavigationView: BottomNavigationView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         binding = RootActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -27,7 +28,7 @@ class RootActivity : AppCompatActivity() {
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.fragmentCreatePlaylist, R.id.playlistInfoFragment -> hideBottomNav()
+                R.id.fragmentCreatePlaylist, R.id.playlistInfoFragment, R.id.trackInfoFragment -> hideBottomNav()
                 else -> showBottomNav()
             }
         }

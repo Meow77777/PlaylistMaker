@@ -134,8 +134,7 @@ class PlaylistInfoFragment : Fragment() {
             binding.playlistInfoSheet.playlistNameSheet.text = playlist.name
             binding.playlistInfoSheet.playlistCountTracksSheet.text =
                 getTracksCountString(playlist.tracks)
-            Glide.with(requireContext())
-                .load(playlist.image?.toUri())
+            Glide.with(requireContext()).load(playlist.image?.toUri())
                 .placeholder(R.drawable.placeholder)
                 .transform(RoundedCorners(DateTimeUtil.dpToPx(2f, requireContext())))
                 .into(binding.playlistInfoSheet.playlistImageSheet)
@@ -175,7 +174,7 @@ class PlaylistInfoFragment : Fragment() {
         // Проверка, есть ли хотя бы один трек в плейлисте
         if (playlist.tracks.isEmpty()) {
             Toast.makeText(
-                requireContext(), R.string.no_tracks_in_playlist, Toast.LENGTH_LONG
+                requireContext(), R.string.no_tracks_in_playlist_to_share, Toast.LENGTH_LONG
             ).show()
             return
         }
@@ -216,9 +215,29 @@ class PlaylistInfoFragment : Fragment() {
             .setMessage(R.string.delete_track_question)
             .setPositiveButton(R.string.delete) { dialog, _ ->
                 vm.deleteTrack(
-                    playlist = playlist, track = track
+                    playlist = playlist,
+                    track = track
                 )
                 dialog.dismiss()
+                val reversedTracksList = playlist.tracks.reversed()
+                binding.playlistTracksRecyclerBS.adapter = BottomSheetAdapterTracks(
+                    reversedTracksList.toMutableList(),
+                    object : BottomSheetAdapterTracks.Listener {
+                        override fun onClick(track: Track) {
+                            if (clickDebounce()) {
+                                val bundle = Bundle().apply {
+                                    putParcelable("track", track)
+                                }
+                                findNavController().navigate(
+                                    R.id.trackInfoFragment, bundle
+                                )
+                            }
+                        }
+
+                        override fun onLongClick(track: Track) {
+                            showDeleteTrackDialog(requireContext(), track)
+                        }
+                    })
                 binding.playlistTracksRecyclerBS.adapter?.notifyDataSetChanged()
             }.setNegativeButton(R.string.cancel) { dialog, _ ->
                 dialog.dismiss()
@@ -279,7 +298,9 @@ class PlaylistInfoFragment : Fragment() {
             binding.bottomSheetPlaylistInfo.visibility = View.VISIBLE
             binding.playlistTracksRecyclerBS.layoutManager =
                 LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-            binding.playlistTracksRecyclerBS.adapter = BottomSheetAdapterTracks(playlist.tracks,
+            val reversedTracksList = playlist.tracks.reversed()
+            binding.playlistTracksRecyclerBS.adapter = BottomSheetAdapterTracks(
+                reversedTracksList.toMutableList(),
                 object : BottomSheetAdapterTracks.Listener {
                     override fun onClick(track: Track) {
                         if (clickDebounce()) {
@@ -297,6 +318,8 @@ class PlaylistInfoFragment : Fragment() {
                     }
                 })
         } else {
+            Toast.makeText(requireContext(), getString(R.string.no_tracks_in_playlist), Toast.LENGTH_LONG)
+                .show()
             binding.bottomSheetPlaylistInfo.visibility = View.GONE
         }
     }

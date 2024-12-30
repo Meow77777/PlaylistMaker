@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -13,6 +14,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -156,6 +158,20 @@ class FragmentCreatePlaylist : Fragment() {
                     }
                 }
             })
+
+        binding.nestedScrollView.viewTreeObserver.addOnGlobalLayoutListener {
+            val rect = Rect()
+            binding.nestedScrollView.getWindowVisibleDisplayFrame(rect)
+
+            val screenHeight = binding.nestedScrollView.rootView.height
+            val keypadHeight = screenHeight - rect.bottom
+
+            if (keypadHeight > 100) {
+                binding.createPlaylistButton.visibility = View.GONE
+            } else {
+                binding.createPlaylistButton.visibility = View.VISIBLE
+            }
+        }
     }
 
     private fun saveChanges(updatedPlaylist: Playlist) {
@@ -191,5 +207,4 @@ class FragmentCreatePlaylist : Fragment() {
         BitmapFactory.decodeStream(inputStream)
             .compress(Bitmap.CompressFormat.JPEG, 30, outputStream)
     }
-
 }

@@ -28,7 +28,7 @@
 
         <ImageView
             android:id="@+id/backFromPlaylistInfo"
-            style="@style/BackButtonSettingsStyle"
+            app:tint="@color/black_main"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginStart="@dimen/padding4"
