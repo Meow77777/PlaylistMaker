@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker.mediateka.ui
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -20,6 +21,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -186,12 +188,24 @@ class FragmentCreatePlaylist : Fragment() {
     }
 
     private fun showDialog() {
-        MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.finishPlaylistCreating)
-            .setMessage(R.string.dataWillLost).setNegativeButton(R.string.cancel) { _, _ ->
+        val dialog = MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.finishPlaylistCreating)
+            .setMessage(R.string.dataWillLost)
+            .setNegativeButton(R.string.cancel) { _, _ ->
                 //ничего не делаем
             }.setPositiveButton(R.string.complete) { _, _ ->
                 findNavController().popBackStack()
-            }.show()
+            }.create()
+
+        dialog.setOnShowListener {
+            val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            val negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+
+            // Устанавливаем цвет для кнопок
+            positiveButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.blue))
+            negativeButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.blue))
+        }
+
+        dialog.show()
     }
 
     private fun saveImageToPrivateStorage(uri: Uri) {

@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -211,12 +212,11 @@ class PlaylistInfoFragment : Fragment() {
     }
 
     fun showDeleteTrackDialog(context: Context, track: Track) {
-        AlertDialog.Builder(context).setTitle(R.string.delete_track)
+        val dialog = AlertDialog.Builder(context).setTitle(R.string.delete_track)
             .setMessage(R.string.delete_track_question)
             .setPositiveButton(R.string.delete) { dialog, _ ->
                 vm.deleteTrack(
-                    playlist = playlist,
-                    track = track
+                    playlist = playlist, track = track
                 )
                 dialog.dismiss()
                 val reversedTracksList = playlist.tracks.reversed()
@@ -241,11 +241,21 @@ class PlaylistInfoFragment : Fragment() {
                 binding.playlistTracksRecyclerBS.adapter?.notifyDataSetChanged()
             }.setNegativeButton(R.string.cancel) { dialog, _ ->
                 dialog.dismiss()
-            }.show()
+            }.create()
+        dialog.setOnShowListener {
+            val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            val negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+
+            // Устанавливаем цвет для кнопок
+            positiveButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.blue))
+            negativeButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.blue))
+        }
+
+        dialog.show()
     }
 
     private fun showDeletePlaylistDialog(context: Context) {
-        AlertDialog.Builder(context).setTitle(R.string.delete_playlist)
+        val dialog = AlertDialog.Builder(context).setTitle(R.string.delete_playlist)
             .setMessage(R.string.delete_playlist_question)
             .setPositiveButton(R.string.yes) { dialog, _ ->
                 vm.deletePlaylist(
@@ -255,7 +265,17 @@ class PlaylistInfoFragment : Fragment() {
                 findNavController().popBackStack()
             }.setNegativeButton(R.string.no) { dialog, _ ->
                 dialog.dismiss()
-            }.show()
+            }.create()
+        dialog.setOnShowListener {
+            val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            val negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+
+            // Устанавливаем цвет для кнопок
+            positiveButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.blue))
+            negativeButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.blue))
+        }
+
+        dialog.show()
     }
 
     private fun initObservers() {
@@ -299,27 +319,28 @@ class PlaylistInfoFragment : Fragment() {
             binding.playlistTracksRecyclerBS.layoutManager =
                 LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
             val reversedTracksList = playlist.tracks.reversed()
-            binding.playlistTracksRecyclerBS.adapter = BottomSheetAdapterTracks(
-                reversedTracksList.toMutableList(),
-                object : BottomSheetAdapterTracks.Listener {
-                    override fun onClick(track: Track) {
-                        if (clickDebounce()) {
-                            val bundle = Bundle().apply {
-                                putParcelable("track", track)
+            binding.playlistTracksRecyclerBS.adapter =
+                BottomSheetAdapterTracks(reversedTracksList.toMutableList(),
+                    object : BottomSheetAdapterTracks.Listener {
+                        override fun onClick(track: Track) {
+                            if (clickDebounce()) {
+                                val bundle = Bundle().apply {
+                                    putParcelable("track", track)
+                                }
+                                findNavController().navigate(
+                                    R.id.trackInfoFragment, bundle
+                                )
                             }
-                            findNavController().navigate(
-                                R.id.trackInfoFragment, bundle
-                            )
                         }
-                    }
 
-                    override fun onLongClick(track: Track) {
-                        showDeleteTrackDialog(requireContext(), track)
-                    }
-                })
+                        override fun onLongClick(track: Track) {
+                            showDeleteTrackDialog(requireContext(), track)
+                        }
+                    })
         } else {
-            Toast.makeText(requireContext(), getString(R.string.no_tracks_in_playlist), Toast.LENGTH_LONG)
-                .show()
+            Toast.makeText(
+                requireContext(), getString(R.string.no_tracks_in_playlist), Toast.LENGTH_LONG
+            ).show()
             binding.bottomSheetPlaylistInfo.visibility = View.GONE
         }
     }

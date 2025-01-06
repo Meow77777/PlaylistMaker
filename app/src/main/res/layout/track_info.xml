@@ -10,23 +10,22 @@
     tools:context=".player.ui.TrackInfoFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id = "@+id/constraintLayout"
+        android:id="@+id/constraintLayout"
         style="@style/SettingsBackgroundColorStyle"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="com.practicum.playlistmaker.player.ui.TrackInfoFragment">
 
         <FrameLayout
-            android:id = "@+id/darkFrame"
+            android:id="@+id/darkFrame"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             android:background="#66000000"
             android:visibility="invisible"
-            />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/backFromTrackInfo"
@@ -66,8 +65,6 @@
             app:layout_constraintEnd_toStartOf="@id/rightLine24"
             app:layout_constraintStart_toStartOf="@id/leftLine24"
             app:layout_constraintTop_toBottomOf="@id/backFromTrackInfo"
-
-
             />
 
         <TextView
@@ -90,7 +87,7 @@
             app:layout_constraintEnd_toStartOf="@id/rightLine24"
             app:layout_constraintStart_toEndOf="@id/leftLine24"
             app:layout_constraintTop_toBottomOf="@id/songNameTrackInfo"
-            tools:context = ".player.ui.TrackInfoFragment"
+            tools:context=".player.ui.TrackInfoFragment"
             tools:text="The Beatles" />
 
         <ImageButton
@@ -226,50 +223,48 @@
 
     <LinearLayout
         android:id="@+id/standard_bottom_sheet"
+        style="@style/BottomSheetStyle"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/rounded_bottom_sheet"
-        style="@style/BottomSheetStyle"
         android:orientation="vertical"
         app:behavior_hideable="true"
         app:behavior_peekHeight="505dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <View
+            style="@style/BottomSheetViewStyle"
             android:layout_width="50dp"
             android:layout_height="4dp"
             android:layout_gravity="center"
             android:layout_marginTop="@dimen/padding8"
-            style="@style/BottomSheetViewStyle"
             android:background="@drawable/rounded_view" />
 
         <TextView
+            style="@style/BottomSheetTitleStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/padding12"
             android:gravity="center"
             android:paddingTop="@dimen/padding16"
             android:paddingBottom="@dimen/padding12"
-            style="@style/BottomSheetTitleStyle"
             android:text="Добавить в плейлист"
             android:textSize="19sp"
             android:textStyle="bold" />
 
         <Button
             android:id="@+id/addNewPlaylist"
+            style="@style/ResetButtonSearch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/ResetButtonSearch"
             android:layout_marginTop="@dimen/padding16"
-            android:text="@string/newPlaylist"
-             />
+            android:text="@string/newPlaylist" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/playlistRecyclerBS"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/size24"
-            />
+            android:layout_marginTop="@dimen/size24" />
 
     </LinearLayout>
 
