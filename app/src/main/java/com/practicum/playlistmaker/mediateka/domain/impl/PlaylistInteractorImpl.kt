@@ -4,7 +4,8 @@ import com.practicum.playlistmaker.mediateka.domain.api.PlaylistInteractor
 import com.practicum.playlistmaker.mediateka.domain.repository.PlaylistRepository
 import com.practicum.playlistmaker.mediateka.models.Playlist
 
-class PlaylistInteractorImpl(private val playlistRepository: PlaylistRepository) : PlaylistInteractor {
+class PlaylistInteractorImpl(private val playlistRepository: PlaylistRepository) :
+    PlaylistInteractor {
     override suspend fun addPlaylist(playlist: Playlist) {
         playlistRepository.addPlaylist(playlist)
     }
@@ -15,5 +16,9 @@ class PlaylistInteractorImpl(private val playlistRepository: PlaylistRepository)
 
     override suspend fun updatePlaylist(playlist: Playlist) {
         playlistRepository.updatePlaylist(playlist)
+    }
+
+    override suspend fun deletePlaylist(playlist: Playlist) {
+        playlistRepository.deletePlaylist(playlist)
     }
 }

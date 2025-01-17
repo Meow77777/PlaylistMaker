@@ -1,6 +1,8 @@
 package com.practicum.playlistmaker.search.presentation
 
 import android.app.Application
+import android.content.Context
+import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,6 +13,8 @@ import com.practicum.playlistmaker.search.models.Track
 import com.practicum.playlistmaker.search.presentation.state.TracksState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 class SearchTracksViewModel(

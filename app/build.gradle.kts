@@ -55,6 +55,8 @@ android {
 }
 
 dependencies {
+    implementation("androidx.core:core-ktx:1.15.0")
+    implementation("androidx.core:core:1.15.0")
     val room_version = "2.6.1"
     val mapstructVersion = "1.6.0"
     implementation("androidx.room:room-runtime:$room_version")
@@ -63,8 +65,8 @@ dependencies {
     implementation ("org.mapstruct:mapstruct:${mapstructVersion}")
     annotationProcessor ("org.mapstruct:mapstruct-processor:${mapstructVersion}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.8.4")
-    implementation("androidx.navigation:navigation-ui-ktx:2.8.4")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.8.5")
+    implementation("androidx.navigation:navigation-ui-ktx:2.8.5")
     implementation("androidx.fragment:fragment-ktx:1.8.5")
     implementation("androidx.work:work-runtime-ktx:2.10.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.0")

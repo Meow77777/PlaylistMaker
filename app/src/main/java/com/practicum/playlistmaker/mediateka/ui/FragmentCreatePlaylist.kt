@@ -1,7 +1,11 @@
 package com.practicum.playlistmaker.mediateka.ui
 
+import android.app.Activity
+import android.app.AlertDialog
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -11,11 +15,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -49,11 +56,27 @@ class FragmentCreatePlaylist : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.createPlaylistButton.isEnabled = false
+        val playlistToEdit = arguments?.getParcelable<Playlist>("playlist_to_edit")
+
+        if (playlistToEdit != null) {
+            binding.createPlaylistButton.isEnabled = true
+            binding.title.text = getString(R.string.edit)
+            binding.createPlaylistButton.text = getString(R.string.save)
+
+            binding.editTextNamePlaylist.setText(playlistToEdit.name)
+            binding.editTextDescriptionPlaylist.setText(playlistToEdit.description)
+            binding.addPlaylistImage.scaleType = ImageView.ScaleType.FIT_XY
+            Glide.with(requireContext()).load(playlistToEdit.image?.toUri())
+                .placeholder(R.drawable.placeholder)
+                .transform(RoundedCorners(DateTimeUtil.dpToPx(8f, requireContext())))
+                .into(binding.addPlaylistImage)
+        }
 
         val pickMedia =
             registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
                 if (uri != null) {
-                    //binding.addPlaylistImage.setImageURI(uri)
+                    val resolver = requireContext().contentResolver
+                    resolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     binding.addPlaylistImage.scaleType = ImageView.ScaleType.FIT_XY
                     Glide.with(binding.addPlaylistImage).load(uri).fitCenter()
                         .transform(RoundedCorners(DateTimeUtil.dpToPx(8f, requireContext())))
@@ -82,30 +105,38 @@ class FragmentCreatePlaylist : Fragment() {
 
         binding.createPlaylistButton.setOnClickListener {
             if (binding.createPlaylistButton.isEnabled) {
-                val playlistImageUri = if (imageUri != null) imageUri.toString() else ""
-                val newPlaylist = Playlist(
-                    name = binding.editTextNamePlaylist.text.toString(),
-                    description = binding.editTextDescriptionPlaylist.text.toString(),
-                    image = playlistImageUri,
-                    tracks = mutableListOf()
-                )
-                vm.addPlaylist(playlist = newPlaylist)
+                if (playlistToEdit != null) {
+                    playlistToEdit.apply {
+                        name = binding.editTextNamePlaylist.text.toString()
+                        description = binding.editTextDescriptionPlaylist.text.toString()
+                        image = if (imageUri != null) imageUri.toString() else image
+                    }
+                    saveChanges(playlistToEdit)
+                } else {
+                    val playlistImageUri = if (imageUri != null) imageUri.toString() else ""
+                    val newPlaylist = Playlist(
+                        name = binding.editTextNamePlaylist.text.toString(),
+                        description = binding.editTextDescriptionPlaylist.text.toString(),
+                        image = playlistImageUri,
+                        tracks = mutableListOf()
+                    )
+                    vm.addPlaylist(playlist = newPlaylist)
 
-                val navController = findNavController()
+                    Toast.makeText(
+                        requireContext(),
+                        "Плейлист ${binding.editTextNamePlaylist.text.toString()} создан",
+                        Toast.LENGTH_LONG
+                    ).show()
 
-                Toast.makeText(
-                    requireContext(),
-                    "Плейлист ${binding.editTextNamePlaylist.text.toString()} создан",
-                    Toast.LENGTH_LONG
-                ).show()
-
-                navController.popBackStack()
-
+                    findNavController().popBackStack()
+                }
             }
         }
 
         binding.backFromCreatePlaylist.setOnClickListener {
-            if ((binding.editTextNamePlaylist.text?.isNotEmpty() == true) or (binding.editTextDescriptionPlaylist.text?.isNotEmpty() == true) or (binding.addPlaylistImage.drawable != null)) {
+            if (playlistToEdit != null) {
+                findNavController().popBackStack()
+            } else if ((binding.editTextNamePlaylist.text?.isNotEmpty() == true) or (binding.editTextDescriptionPlaylist.text?.isNotEmpty() == true) or (binding.addPlaylistImage.drawable != null)) {
                 showDialog()
             } else {
                 findNavController().popBackStack()
@@ -116,28 +147,65 @@ class FragmentCreatePlaylist : Fragment() {
             hasUnsavedChanges = !it.isNullOrEmpty()
         }
 
-        requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    if (hasUnsavedChanges) {
+                    if (playlistToEdit != null) {
+                        findNavController().popBackStack()
+                    } else if (hasUnsavedChanges) {
                         showDialog()
                     } else {
                         isEnabled = false
                         requireActivity().onBackPressed()
                     }
                 }
+            })
+
+        binding.nestedScrollView.viewTreeObserver.addOnGlobalLayoutListener {
+            val rect = Rect()
+            binding.nestedScrollView.getWindowVisibleDisplayFrame(rect)
+
+            val screenHeight = binding.nestedScrollView.rootView.height
+            val keypadHeight = screenHeight - rect.bottom
+
+            if (keypadHeight > 100) {
+                binding.createPlaylistButton.visibility = View.GONE
+            } else {
+                binding.createPlaylistButton.visibility = View.VISIBLE
             }
-        )
+        }
+    }
+
+    private fun saveChanges(updatedPlaylist: Playlist) {
+        vm.updatePlaylist(updatedPlaylist)
+
+        findNavController().popBackStack()
+
+        val resultIntent = Intent().apply {
+            putExtra("updated_playlist", updatedPlaylist)
+        }
+        requireActivity().setResult(Activity.RESULT_OK, resultIntent)
     }
 
     private fun showDialog() {
-        MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.finishPlaylistCreating)
-            .setMessage(R.string.dataWillLost).setNegativeButton(R.string.cancel) { _, _ ->
+        val dialog = MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.finishPlaylistCreating)
+            .setMessage(R.string.dataWillLost)
+            .setNegativeButton(R.string.cancel) { _, _ ->
                 //ничего не делаем
             }.setPositiveButton(R.string.complete) { _, _ ->
                 findNavController().popBackStack()
-            }.show()
+            }.create()
+
+        dialog.setOnShowListener {
+            val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            val negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+
+            // Устанавливаем цвет для кнопок
+            positiveButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.blue))
+            negativeButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.blue))
+        }
+
+        dialog.show()
     }
 
     private fun saveImageToPrivateStorage(uri: Uri) {
@@ -153,5 +221,4 @@ class FragmentCreatePlaylist : Fragment() {
         BitmapFactory.decodeStream(inputStream)
             .compress(Bitmap.CompressFormat.JPEG, 30, outputStream)
     }
-
 }

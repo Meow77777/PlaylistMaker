@@ -80,15 +80,6 @@ class TrackInfoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-        val fragmentManager = parentFragmentManager
-        val backStackCount = fragmentManager.backStackEntryCount
-
-        for (i in 0 until backStackCount) {
-            val backStackEntry = fragmentManager.getBackStackEntryAt(i)
-            Log.d("BackStack", "Fragment at $i: ${backStackEntry.name}")
-        }
-
         play = binding.playButtonTrackInfo
         backButton = binding.backFromTrackInfo
         trackName = binding.songNameTrackInfo
@@ -134,9 +125,7 @@ class TrackInfoFragment : Fragment() {
         }
 
         val trackInfoDetails = track.let { TrackDetailsMapper.map(it) }
-        if (trackInfoDetails != null) {
-            showTrackDetails(trackInfoDetails)
-        }
+        showTrackDetails(trackInfoDetails)
 
         vm.loadPlayer()
 
@@ -218,8 +207,6 @@ class TrackInfoFragment : Fragment() {
             listOfPlaylists.addAll(playlists)
             bottomSheetAdapter.notifyDataSetChanged()
         }
-
-
 
         addToPlaylist.setOnClickListener {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED

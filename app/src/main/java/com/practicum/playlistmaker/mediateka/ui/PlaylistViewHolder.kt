@@ -11,7 +11,7 @@ import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.mediateka.models.Playlist
 import com.practicum.playlistmaker.utils.DateTimeUtil
 
-class PlaylistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class PlaylistViewHolder(itemView: View, private val clickListener: PlaylistAdapter.Listener) : RecyclerView.ViewHolder(itemView) {
 
     private val playlistImage: ImageView = itemView.findViewById(R.id.playlistImage)
     private val playlistName: TextView = itemView.findViewById(R.id.playlistName)
@@ -24,9 +24,9 @@ class PlaylistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         playlistName.text = playlist.name
         playlistNumberOfTracks.text = getTrackCountText(playlist.tracks.size)
 
-//        itemView.setOnClickListener {
-//            clickListener.onClick(track = model)
-//        }
+        itemView.setOnClickListener {
+            clickListener.onClick(playlist = playlist)
+        }
 
     }
 

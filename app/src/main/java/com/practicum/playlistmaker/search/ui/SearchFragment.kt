@@ -2,6 +2,7 @@ package com.practicum.playlistmaker.search.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -14,18 +15,28 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentSearchBinding
 import com.practicum.playlistmaker.search.models.Track
 import com.practicum.playlistmaker.search.presentation.SearchTracksViewModel
 import com.practicum.playlistmaker.search.presentation.state.TracksState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -38,6 +49,7 @@ class SearchFragment : Fragment() {
         private const val EDIT_TEXT_ENTER = ""
     }
 
+    private var jobListener: Job? = null
     lateinit var editText: EditText
 
     private val tracks = ArrayList<Track>()
@@ -64,6 +76,7 @@ class SearchFragment : Fragment() {
     private lateinit var tracksListHistory: MutableList<Track>
 
     private lateinit var binding: FragmentSearchBinding
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -96,6 +109,7 @@ class SearchFragment : Fragment() {
         recycler.isVisible = false
 
         tracksListHistory = mutableListOf()
+        val bottomNavigationView = requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView)
 
         vm.getHistoryTracksLiveData().observe(viewLifecycleOwner) { listOfHistoryTracks ->
             tracksListHistory = listOfHistoryTracks
@@ -229,10 +243,10 @@ class SearchFragment : Fragment() {
         }
         editText.addTextChangedListener(simpleTextWatcher)
 
-
         vm.observeState().observe(viewLifecycleOwner) {
             render(it)
         }
+
         placeholderResetButton.setOnClickListener {
             vm.searchDebounce(changedText = searchText)
             hidePlaceholder()
@@ -243,10 +257,8 @@ class SearchFragment : Fragment() {
         editText.text.clear()
         vm.clearLiveDataTrackState()
         simpleTextWatcher.let { binding.editText.removeTextChangedListener(it) }
-
         super.onDestroyView()
     }
-
 
     private fun render(state: TracksState) {
         when (state) {
